@@ -86,7 +86,7 @@ async function main(){
  assert.ok(w.document.querySelector('#rv-history').querySelector('button'),'Replay UI loads saved series');
  const seeded=w.RIVALRY_ENGINE.create({a:'San Francisco Shock · 2019',b:'Shanghai Dragons · 2021',rules:'classic',best:3,seed:77});
  assert.equal(seeded.teams[0].players.length,6,'Classic 6v6 team supported');
- const unknown=w.RIVALRY_ENGINE.create({a:'Team Peps',b:'VARREL',best:3,seed:71});
+ const unknown=w.RIVALRY_ENGINE.create({a:'Cheeseburger',b:'VARREL',best:3,seed:71});
  assert.ok(unknown.teams[0].players.every(p=>p.verified===false),'Unverified players are not fictional real names');
  w.close();
  console.log('PASS: exact-year rosters, 54 heroes, historic release restrictions, 2026 role changes, 5v5, 6v6, gallery, live simulation, and tournament.');
