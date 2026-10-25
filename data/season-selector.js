@@ -44,7 +44,14 @@ function draw(side,keep=false){
    select.add(new Option(String(y)+(r?' · roster sourced':' · roster not verified'),String(y)));
  }
  if(wanted&&years.includes(wanted))select.value=String(wanted);
- else select.value=String(years.includes(2026)?2026:years[0]);
+ else{
+  const sourced=years.filter(y=>window.RIVALRY_ROSTER_FOR?.(team,y));
+  // Generic OWL franchise entries should land on their newest sourced season,
+  // not a recent unsourced year full of OPEN slots.
+  const preferred=team.endsWith(' · OWL')&&sourced.length?sourced[0]:
+     years.includes(2026)?2026:years[0];
+  select.value=String(preferred);
+ }
  const info=get('rv-season-note-'+side),r=roster(side);
  info.replaceChildren();
  if(r){
