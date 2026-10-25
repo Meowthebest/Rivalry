@@ -1,0 +1,89 @@
+/* Rivalry Broadcast Studio — distinctive original UI inspired by spectator conventions
+   Team emblems and fallback portraits are originally drawn UI, not Blizzard artwork. */
+#rivalry-studio{--rv-a:#f3ad64;--rv-b:#9aafff;--rv-bg:#070c13;position:fixed;inset:0;z-index:200;background:#060b12;color:#f3f7fc;display:none;overflow:auto;font:12px/1.5 'DM Sans',system-ui,sans-serif;scrollbar-color:#3e5363 #0d1521}
+#rivalry-studio.open{display:block}#rivalry-studio *{box-sizing:border-box}
+#rivalry-studio button,#rivalry-studio select,#rivalry-studio input{font:inherit}
+#rivalry-studio button{cursor:pointer}#rivalry-studio button:focus-visible,#rivalry-studio select:focus-visible,#rivalry-studio input:focus-visible{outline:2px solid #d6fc84;outline-offset:2px}
+.rv-shell{min-height:100%;background:linear-gradient(180deg,#111925,#070c13 520px);padding-bottom:80px}
+.rv-header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:14px clamp(16px,3vw,44px);background:#0b121c;border-bottom:1px solid #283746;position:sticky;top:0;z-index:30;box-shadow:0 12px 30px #0005}
+.rv-brand{font:900 24px 'Barlow Condensed',Impact,sans-serif;letter-spacing:.5px;color:white;white-space:nowrap}.rv-brand span{color:#f59f5f}.rv-brand small{font:800 8px 'DM Sans',sans-serif;color:#8294a8;display:block;letter-spacing:2px;margin-top:-3px}
+.rv-nav{display:flex;gap:6px;align-items:center}.rv-nav button{border:1px solid transparent;background:transparent;color:#94a7ba;padding:10px 15px;border-radius:5px;font-weight:800!important;font-size:11px!important;letter-spacing:.7px}
+.rv-nav button.active{background:#23323d;color:#f5bc86;border-color:#4a5967}.rv-nav button:hover{color:#fff}
+.rv-quit{background:#1b2734!important;border:1px solid #3f4d5b!important;border-radius:6px;color:#eff5fb!important;padding:10px 15px;font-weight:900!important;font-size:11px!important}
+.rv-view{display:none;max-width:1720px;margin:0 auto;padding:20px clamp(16px,2.6vw,45px)}.rv-view.active{display:block}
+.rv-eyebrow{font-size:10px;font-weight:900;letter-spacing:2px;color:#d2af7d}
+.rv-broadcast{border:1px solid #425060;background:#101a26;box-shadow:0 25px 100px #0008}
+.rv-scorebar{display:grid;grid-template-columns:minmax(220px,1fr) minmax(175px,.65fr) minmax(220px,1fr);min-height:117px;align-items:center;background:#0b1521}
+.rv-team-banner{padding:14px 28px;display:flex;gap:14px;align-items:center;min-width:0;position:relative}
+.rv-team-banner:first-child{border-top:4px solid var(--rv-a)}.rv-team-banner:last-child{border-top:4px solid var(--rv-b);justify-content:flex-end;text-align:right;flex-direction:row-reverse}
+.rv-logo{width:69px;height:64px;display:grid;place-items:center;background:#22303f;clip-path:polygon(50% 0%,91% 17%,91% 78%,50% 100%,9% 78%,9% 17%);border-radius:7px;color:#f5c17b;font:900 26px 'Barlow Condensed',Impact,sans-serif;flex-shrink:0;position:relative}
+.rv-team-banner:first-child .rv-logo{color:var(--rv-a);background:color-mix(in srgb,var(--rv-a) 18%,#151c2a)}.rv-team-banner:last-child .rv-logo{color:var(--rv-b);background:color-mix(in srgb,var(--rv-b) 18%,#151c2a)}
+.rv-name{font:900 clamp(21px,2.4vw,34px)/.97 'Barlow Condensed',sans-serif;text-transform:uppercase;overflow-wrap:anywhere}
+.rv-team-tag{color:#8a9cb0;font-weight:900;font-size:9px;letter-spacing:1.2px;margin-top:6px}
+.rv-seriescenter{text-align:center;padding:6px;min-width:0}.rv-seriesnumber{font:900 50px/.9 'Barlow Condensed',Impact,sans-serif;white-space:nowrap}.rv-seriesnumber span{font-size:23px;color:#77889b;margin:0 9px}.rv-serieslabel{font-size:9px;letter-spacing:1.5px;color:#a1b1c2;font-weight:900;margin-top:10px}
+.rv-subbar{background:#142232;border-top:1px solid #3a4859;border-bottom:1px solid #415264;display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;font-size:10px;font-weight:900;letter-spacing:.8px}
+.rv-maplabel{color:#f8bd79}.rv-timer{font:900 24px 'Barlow Condensed',sans-serif;color:#fff}.rv-badge{background:#233629;color:#a8ff8d;border:1px solid #44654c;border-radius:4px;padding:5px 9px;font-size:9px;font-weight:900;letter-spacing:1px}
+.rv-ot{background:#5c2431!important;color:#ffb4b4!important;border-color:#f96872!important;animation:rv-pulse 1s infinite alternate}
+.rv-theater{height:clamp(365px,43vw,550px);position:relative;background:linear-gradient(120deg,#0a1623ae,#1723383b),url("./assets/arena.svg") center/cover no-repeat;overflow:hidden}
+.rv-theater:before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 44% 80%,#ffa64e28,transparent 49%),linear-gradient(90deg,#07101ae6 0,transparent 40%,#07101bc9 100%);pointer-events:none}
+.rv-mapinfo{position:absolute;top:24px;left:25px;z-index:2}.rv-mapinfo h1{font:900 clamp(36px,5vw,70px)/.85 'Barlow Condensed',Impact,sans-serif;margin:9px 0}.rv-mapinfo p{color:#98abb9;font-weight:900;letter-spacing:1.3px;font-size:10px;margin-top:12px}
+.rv-mapradar{position:absolute;inset:auto auto 27px 25px;border:1px solid #68819067;background:#101b29bf;padding:13px 17px;border-radius:8px;min-width:min(280px,35vw);backdrop-filter:blur(8px);z-index:2}
+.rv-mapradar .head{display:flex;justify-content:space-between;gap:9px;color:#c2d0de;font-size:9px;letter-spacing:1px;font-weight:900}
+.rv-bar{height:9px;background:#313e4b;position:relative;overflow:hidden;margin:10px 0 7px;border-radius:2px}
+.rv-bar .a{background:var(--rv-a);height:100%;position:absolute;inset:0 auto 0 0;transition:width .35s}
+.rv-bar .b{background:var(--rv-b);height:100%;position:absolute;inset:0 0 0 auto;transition:width .35s}
+.rv-mapradar .foot{font-size:9px;color:#afc0ca}.rv-mapradar .foot strong{color:#ffe7bc}
+.rv-caster{position:absolute;left:25px;right:25px;bottom:26px;padding:16px 20px;background:#0a1420e6;border:1px solid #466075;border-left:4px solid #f3aa62;max-width:620px;color:#e5f0f9;font:800 14px/1.5 'DM Sans',sans-serif;backdrop-filter:blur(8px);z-index:4;transform:translateY(0)}
+.rv-caster small{display:block;color:#eeb478;font-size:9px;letter-spacing:1.4px;margin-bottom:5px}
+.rv-killfeed{position:absolute;top:22px;right:22px;z-index:5;display:flex;flex-direction:column;align-items:flex-end;gap:7px;max-width:min(470px,51vw)}
+.rv-feedrow{display:flex;align-items:center;gap:6px;min-height:37px;max-width:100%;padding:3px 7px;background:#070c14db;border:1px solid #41505cc9;box-shadow:0 5px 13px #0008;animation:rv-slide .26s ease-out;white-space:nowrap;font-weight:900;font-size:11px}
+.rv-feedrow .rv-portrait{width:27px;height:27px;border:1px solid #465c70;flex-shrink:0}.rv-feedrow .rv-killer{color:var(--rv-a)}.rv-feedrow.b .rv-killer{color:var(--rv-b)}
+.rv-feedrow .rv-victim{color:#dde8f1}.rv-feedrow .rv-assist{font-size:9px;color:#adbcc7}.rv-killaction{display:flex;gap:5px;align-items:center;background:#29323d;padding:5px;color:#fff;border-radius:3px}.rv-headshot{color:#ffd06d}.rv-environment{color:#68dbdb}
+.rv-despawn{animation:rv-out .3s forwards}
+.rv-sides{display:grid;grid-template-columns:1fr minmax(320px,.97fr) 1fr;gap:12px;margin-top:14px}
+.rv-roster{min-width:0;border:1px solid #344657;background:#0f1a27;padding:10px;display:flex;flex-direction:column;gap:7px}.rv-roster.b{--t:var(--rv-b)}.rv-roster.a{--t:var(--rv-a)}
+.rv-roster h3{font:900 18px 'Barlow Condensed',sans-serif;letter-spacing:.5px;margin:3px 5px 8px;display:flex;justify-content:space-between;gap:5px}.rv-roster h3 span{font-size:10px;color:#b0c0cf}
+.rv-player{display:grid;grid-template-columns:40px minmax(0,1fr) 58px;align-items:center;gap:8px;border:1px solid #35465a;border-left:3px solid var(--t);padding:6px 8px;background:#172534;min-height:58px;position:relative;overflow:hidden}
+.rv-player.dead{opacity:.54;filter:grayscale(.65)}.rv-player.ultready{box-shadow:inset 0 0 20px #efe5880d}.rv-player .rv-portrait{width:39px;height:39px;border:1px solid #526478}
+.rv-portrait{background:linear-gradient(145deg,#38495b,#1a2938);border-radius:3px;display:grid;place-items:center;color:#e8f0f8;font:900 16px 'Barlow Condensed',sans-serif;overflow:hidden;position:relative}
+.rv-portrait img{width:100%;height:100%;object-fit:cover;display:block}
+.rv-player .who{min-width:0}.rv-player .who b{display:block;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rv-player .who small{display:block;color:#91a6b7;font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rv-health{height:4px;background:#273746;margin-top:5px}.rv-health i{display:block;background:#a6ddc5;height:100%;transition:width .15s}
+.rv-player .charge{text-align:right;color:#d6dfe8;font:900 21px 'Barlow Condensed',sans-serif}.rv-player .charge b{display:block;font:900 9px 'DM Sans',sans-serif;color:#92a7b9}.rv-player.ultready .charge{color:#ffe197}
+.rv-center{display:flex;flex-direction:column;gap:12px;min-width:0}
+.rv-panel{border:1px solid #324557;background:#101b28;min-width:0}.rv-panelhead{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #31465a;padding:12px 15px}.rv-panelhead h3{font:900 18px 'Barlow Condensed',sans-serif;margin:0}.rv-panelhead small{font-size:9px;letter-spacing:1px;color:#b9a988;font-weight:900}
+.rv-controls{padding:13px;display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.rv-command{background:#1d2b39;border:1px solid #405368;border-radius:5px;color:#e6f0fa;padding:11px 7px;min-height:65px;font-weight:900!important;font-size:10px!important;letter-spacing:.45px}
+.rv-command:hover,.rv-command.active{background:#3d352d;border-color:#f9b56a;color:#ffe1b4}
+.rv-toolbar{display:flex;gap:7px;flex-wrap:wrap;padding:0 13px 13px}
+.rv-tool{border:1px solid #48596b;background:#202d3d;color:#e7f2fc;border-radius:4px;padding:8px 12px;font-weight:900!important;font-size:10px!important;letter-spacing:.6px}.rv-tool.accent{color:#152018;background:#a9f37b;border-color:#a9f37b}
+.rv-tool.selected{color:#171b22;background:#f8bc7f;border-color:#f8bc7f}.rv-tool:disabled{opacity:.4}
+.rv-speed{margin-left:auto;display:flex;gap:3px}.rv-speed button{min-width:32px}
+.rv-now{padding:13px 16px;color:#acbdc9;font-size:11px}
+.rv-now b{color:#f4bc84}.rv-stathead{padding:11px 14px;border-bottom:1px solid #33485a;font:900 15px 'Barlow Condensed',sans-serif}
+.rv-stattable{width:100%;border-collapse:collapse;font-size:10px;table-layout:fixed}.rv-stattable th{color:#8ca0b3;font-size:8px;letter-spacing:.7px;padding:8px 3px;text-align:right;background:#142131}.rv-stattable th:first-child{text-align:left;padding-left:8px;width:24%}.rv-stattable td{padding:8px 4px;text-align:right;border-top:1px solid #293b4d;color:#cbd7e0}.rv-stattable td:first-child{text-align:left;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:8px}.rv-stattable tr.a td:first-child{color:var(--rv-a)}.rv-stattable tr.b td:first-child{color:var(--rv-b)}
+.rv-bottom{display:grid;grid-template-columns:1.45fr 1fr;gap:14px;margin-top:13px}.rv-timeline{max-height:390px;overflow-y:auto;padding:12px 17px;scrollbar-color:#415365 #172330}
+.rv-event{display:flex;gap:12px;padding:9px 0;border-bottom:1px solid #2b3b4b;font-size:11px;color:#b7c9d5}.rv-event span{color:#7e93a6;flex:0 0 37px}.rv-event b{color:#d6c19b;font-size:9px;letter-spacing:.7px;display:block}.rv-event.important{color:#fff}
+.rv-broadcastfooter{margin-top:13px;font-size:9px;color:#7c90a0;text-align:center}
+.rv-hub-title{font:900 clamp(34px,4vw,56px) 'Barlow Condensed',sans-serif;margin:7px 0 6px}.rv-hub-desc{color:#90a4b5;max-width:780px;margin-bottom:22px}
+.rv-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.rv-card{border:1px solid #364a5c;background:#142130;border-radius:7px;padding:17px}
+.rv-card h4{margin:0;font:900 21px 'Barlow Condensed',sans-serif}.rv-card p{color:#98aabb;font-size:11px;line-height:1.65}
+.rv-fields{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.rv-fields input,.rv-fields select,.rv-card select,.rv-card input{background:#0e1b29;color:#f5f8fb;border:1px solid #42556a;border-radius:5px;padding:10px}
+.rv-profile-grid{display:grid;grid-template-columns:280px 1fr;gap:18px}.rv-profiles-scroll{max-height:65vh;overflow:auto;border:1px solid #33465a}
+.rv-profile-pick{width:100%;border:0;border-bottom:1px solid #2c4053;background:#142232;text-align:left;color:#ecf3fa;padding:11px 12px;font-weight:900!important}
+.rv-profile-pick:hover,.rv-profile-pick.selected{background:#32402f;color:#d2fc9a}
+.rv-roster-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.rv-member{display:flex;gap:11px;align-items:center;border:1px solid #384a5b;padding:10px;background:#1a2938}
+.rv-member .rv-portrait{width:43px;height:43px;flex:0 0 43px}.rv-member strong{font-size:12px}.rv-member span{display:block;color:#99abbb;font-size:10px}
+.rv-profile-meta{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 20px}.rv-pill{border:1px solid #526775;background:#20303c;border-radius:4px;padding:5px 9px;color:#d6e2e9;font-size:10px;font-weight:900}
+.rv-roster-warning{border:1px solid #766243;color:#eac898;background:#282519;padding:13px;margin:14px 0;border-radius:5px}
+.rv-bracket{display:flex;gap:15px;align-items:stretch;overflow-x:auto;min-height:330px;padding:9px 0 15px}.rv-round{flex:1;min-width:220px;display:flex;flex-direction:column;gap:15px}.rv-bracket-match{background:#1a2938;border:1px solid #445667;border-radius:5px;padding:10px}.rv-bracket-team{display:flex;justify-content:space-between;gap:14px;border-bottom:1px solid #2e4354;padding:9px 4px}.rv-bracket-team.winner{color:#a9f780;font-weight:900}
+.rv-history-grid{display:grid;gap:10px}.rv-historymatch{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:17px;border:1px solid #35495a;background:#182736}
+.rv-replay-slider{width:100%;accent-color:#f8b56e;margin:12px 0}.rv-setup-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.rv-notice{background:#1a2833;border:1px solid #597262;color:#aadea9;border-radius:5px;padding:12px;font-size:11px;margin:9px 0}
+.rv-mini{font-size:10px;color:#9db0c0}.rv-truth{background:#252620;border:1px solid #74633f;color:#f5d8a1;padding:11px 15px;margin-top:13px;font-size:10px}
+.rv-empty{color:#8798a6;padding:25px;text-align:center}
+.rv-swap-inline{display:flex;gap:6px;align-items:center}.rv-swap-inline select{flex:1;min-width:100px;background:#162333;color:#e9f0f9;padding:7px;border:1px solid #465867;border-radius:4px}
+@keyframes rv-slide{from{opacity:0;transform:translateX(40px) scale(.95)}to{opacity:1;transform:translateX(0) scale(1)}}
+@keyframes rv-out{to{opacity:0;transform:translateX(40px)}}@keyframes rv-pulse{from{box-shadow:0 0 0 #f56b6400}to{box-shadow:0 0 16px #f56b6480}}
+@media(max-width:1240px){.rv-sides{grid-template-columns:1fr 1fr}.rv-center{grid-column:1/-1;grid-row:2}.rv-roster{grid-row:1}.rv-controls{grid-template-columns:repeat(5,minmax(0,1fr))}.rv-grid{grid-template-columns:repeat(2,1fr)}.rv-bottom{grid-template-columns:1fr}.rv-team-banner{padding:12px}.rv-team-banner .rv-logo{width:48px;height:49px;font-size:20px}}
+@media(max-width:780px){.rv-header{flex-wrap:wrap;padding:11px 15px}.rv-nav{order:3;width:100%;overflow-x:auto}.rv-nav button{flex:1;white-space:nowrap;padding:7px 10px}.rv-view{padding:12px}.rv-scorebar{grid-template-columns:1fr 110px 1fr}.rv-logo{display:none}.rv-team-banner{padding:7px 9px}.rv-name{font-size:18px}.rv-team-tag{font-size:8px}.rv-seriesnumber{font-size:35px}.rv-subbar{flex-wrap:wrap;justify-content:center}.rv-theater{height:450px}.rv-mapinfo h1{font-size:43px}.rv-killfeed{top:115px;right:8px;max-width:97%}.rv-feedrow{font-size:9px;min-height:31px}.rv-feedrow .rv-portrait{width:21px;height:21px}.rv-mapradar{left:12px;bottom:130px}.rv-caster{left:11px;bottom:10px;right:11px;font-size:11px;padding:11px}.rv-sides{grid-template-columns:1fr 1fr;gap:6px}.rv-player{grid-template-columns:27px minmax(0,1fr) 37px;padding:5px 3px;gap:4px;min-height:44px}.rv-player .rv-portrait{width:25px;height:27px}.rv-player .who b{font-size:9px}.rv-player .who small{font-size:8px}.rv-player .charge{font-size:17px}.rv-roster{padding:5px;gap:5px}.rv-roster h3{font-size:13px}.rv-panelhead{padding:10px}.rv-profile-grid{grid-template-columns:1fr}.rv-profiles-scroll{max-height:220px}.rv-roster-grid{grid-template-columns:1fr}.rv-grid,.rv-setup-col{grid-template-columns:1fr}.rv-controls{grid-template-columns:repeat(3,1fr)}.rv-toolbar{justify-content:center}.rv-speed{margin-left:0}}
