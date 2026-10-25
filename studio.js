@@ -16,7 +16,7 @@ const short=n=>n.length>17?n.slice(0,15)+'…':n;
 const avatar=n=>String(n).split(/[\s·]+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();
 const themeFor=n=>window.RIVALRY_TEAM_STYLE?.[n]?.primary||(n.includes('Shock')?'#ee945c':n.includes('Mayhem')?'#f8abcb':'#9eb6d4');
 let game=load(KEY,null),auto=null,speed=1,tab='match',lastDisplayedEvent=0,paintTimer=null;
-let history=load(HISTORY,[]),tournament=load(TOURNAMENT,null),profileIndex=0,heroImages={},heroIconsLoaded=false,cmd='hold',replay=null;
+let history=load(HISTORY,[]),tournament=load(TOURNAMENT,null),profileIndex=0,heroImages={},abilityIcons={},detailRequests=new Set(),heroIconsLoaded=false,cmd='hold',replay=null;
 const wrap=node('div');wrap.id='rivalry-studio';
 wrap.innerHTML=`
 <div class="rv-shell">
@@ -107,8 +107,20 @@ function commitHistory(){
  history=history.slice(0,15);save(HISTORY,history);
 }
 function initials(name){return avatar(name)}
+function heroSlug(hero){return String(hero||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replaceAll('.','').replace(/[^a-z0-9]+/g,'-')}
+function ensureAbilityIcons(hero){
+ const slug=heroSlug(hero);if(!slug||detailRequests.has(slug))return;
+ detailRequests.add(slug);
+ fetch('https://overfast-api.tekrop.fr/heroes/'+encodeURIComponent(slug)+'?locale=en-us')
+  .then(r=>r.ok?r.json():Promise.reject(Error('detail unavailable')))
+  .then(data=>{
+   if(!Array.isArray(data.abilities))return;
+   const icons={};data.abilities.forEach(a=>{if(a.name&&/^https:\/\//.test(a.icon||''))icons[a.name]=a.icon});
+   abilityIcons[hero]=icons;if(game&&tab==='match')killFeed();
+  }).catch(()=>{});
+}
 function portrait(hero){
- const url=heroImages[hero];if(url){const i=node('img');i.src=url;i.alt=hero;i.loading='lazy';i.onerror=()=>{delete heroImages[hero];i.remove()};return i}
+ const url=heroImages[hero]||heroImages[heroSlug(hero)];if(url){const i=node('img');i.src=url;i.alt=hero;i.loading='lazy';i.onerror=()=>{delete heroImages[hero];i.remove()};return i}
  return node('span','',hero.replace(/[^A-Za-z]/g,'').slice(0,2).toUpperCase()||'OW');
 }
 function portraitNode(hero){
@@ -120,7 +132,7 @@ function loadPortraits(){
  fetch('https://overfast-api.tekrop.fr/heroes?locale=en-us',{signal:controller.signal})
  .then(r=>r.ok?r.json():Promise.reject(Error('Hero API unavailable')))
  .then(rows=>{if(!Array.isArray(rows))return;
-   rows.forEach(h=>{if(h.name&&h.portrait&&h.portrait.startsWith('https://'))heroImages[h.name]=h.portrait});
+   rows.forEach(h=>{if(h.name&&h.portrait&&h.portrait.startsWith('https://')){heroImages[h.name]=h.portrait;heroImages[heroSlug(h.name)]=h.portrait}});
    if(game&&tab==='match')paint();
  }).catch(()=>{heroIconsLoaded=false});
 }
@@ -135,7 +147,10 @@ function killFeed(){
   const row=node('div','rv-feedrow '+(e.side===1?'b':'a'));row.dataset.id=e.id;
   const maker=node('span','rv-killer',e.killer||(e.self?'SELF':'ENVIRONMENT'));
   row.append(maker,portraitNode(e.killerHero||e.victimHero));
+  if(e.ability&&e.killerHero)ensureAbilityIcons(e.killerHero);
   const action=node('span','rv-killaction',e.environmental?'↘':e.self?'⚠':'✕');
+  const abilityUrl=abilityIcons[e.killerHero]?.[e.ability];
+  if(abilityUrl){const icon=node('img');icon.src=abilityUrl;icon.alt=e.ability;icon.width=17;icon.height=17;icon.style.objectFit='contain';action.replaceChildren(icon)}
   if(e.headshot)action.append(node('span','rv-headshot','⌖'));
   if(e.environmental)action.append(node('span','rv-environment','↘'));
   row.append(action,portraitNode(e.victimHero),node('span','rv-victim',e.victim));
