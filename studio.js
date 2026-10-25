@@ -274,7 +274,7 @@ function renderProfiles(){
   n.onclick=()=>{profileIndex=TEAMS.indexOf(t);renderProfiles()};root.append(n);
  });
  if(!matching.length)root.append(node('div','rv-empty','No teams found.'));
- const team=TEAMS[profileIndex]||matching[0];const profile=$('#rv-profile');profile.replaceChildren();
+ const selected=TEAMS[profileIndex];const team=matching.includes(selected)?selected:matching[0];const profile=$('#rv-profile');profile.replaceChildren();
  if(!team)return;
  profile.append(node('div','rv-eyebrow','SOURCE-BACKED TEAM PROFILE'),node('h2','rv-hub-title',team.name));
  const roster=ROSTERS.find(x=>x.name===team.name);
@@ -324,7 +324,7 @@ function renderTournament(){
    const idx=[0,4,6][round]+i;
    const played=tournament.results[idx],match=node('div','rv-bracket-match');
    for(let j=0;j<2;j++){
-    const name=names[i*2+j]||'TBD',row=node('div','rv-bracket-team'+(played?.winner===name?' winner':''));row.append(node('span','',name),node('strong','',played?String(played.score[played.winner===played.a?0:1-j]??''):''));match.append(row);
+    const name=names[i*2+j]||'TBD',row=node('div','rv-bracket-team'+(played?.winner===name?' winner':''));row.append(node('span','',name),node('strong','',played?String(played.score[j]??''):''));match.append(row);
    }
    col.append(match);
   }bracket.append(col);
