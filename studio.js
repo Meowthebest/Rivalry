@@ -70,15 +70,18 @@ function nav(which){
 function entrantVal(side){const el=$('#team-'+side);if(!el)return side==='a'?'Twisted Minds':'ZETA DIVISION';return el.value==='custom'?($('#custom-'+side)?.value.trim()||'Custom team'):el.value}
 function launch(a,b,options={}){
  pause();const rule=options.rules||$('#rules-era')?.value||'auto';
- const rules=rule==='auto'?(/(?: · (?:OWL|2018|2019|2020|2021))/.test(a+' '+b)?'classic':'modern'):rule;
+ const suffixYear=name=>Number((String(name).match(/·\s*(20\d{2})$/)||[])[1]||0);
+ const yearA=Number(options.seasonA||$('#season-a')?.value||suffixYear(a)||2026);
+ const yearB=Number(options.seasonB||$('#season-b')?.value||suffixYear(b)||2026);
+ // Cross-era auto matchups use modern 5v5. Historical-only 2018–2021 uses classic 6v6.
+ const rules=rule==='auto'?(yearA<=2021 && yearB<=2021?'classic':'modern'):rule;
  const best=Number(options.best||$('#match-format')?.value||5);
  const mapSelect=$('#map-pick');
  const mapFromPicker=window.RIVALRY_OW_MAPS?.[Number(mapSelect?.value||0)]?.name||"King’s Row";
  let maps=ENGINE.maps.map(x=>x[0]);
  const first=options.map||mapFromPicker;
  if(maps.includes(first))maps=[first,...maps.filter(x=>x!==first)];
- game=ENGINE.create({a,b,seasonA:Number(ROSTERS.find(x=>x.name===a)?.season||2026),
-  seasonB:Number(ROSTERS.find(x=>x.name===b)?.season||2026),rules,best,maps,seed:options.seed});
+ game=ENGINE.create({a,b,seasonA:yearA,seasonB:yearB,rules,best,maps,seed:options.seed});
  cmd='hold';lastDisplayedEvent=0;openStudio('match');persist();
  loadPortraits();renderProfiles();
 }
@@ -221,12 +224,16 @@ function picker(){
  const list=node('div');list.style.display='grid';list.style.gap='8px';list.style.marginTop='12px';
  game.teams[0].players.forEach((p,i)=>{
   const row=node('div','rv-swap-inline'),tag=node('span','',p.verified?p.name:'OPEN '+p.role);tag.style.minWidth='95px';tag.style.maxWidth='105px';tag.style.overflow='hidden';tag.style.whiteSpace='nowrap';
-  const choices=node('select'),allowed=Object.entries(ENGINE.HERO).filter(([_,h])=>h[0]===p.role);
-  for(const [hero] of allowed)choices.add(new Option(hero,hero));choices.value=p.hero;
+  const choices=node('select'),catalog=window.RIVALRY_HERO_CATALOG;
+  const allowed=catalog?catalog.atYear(game.teams[0].season,p.role).map(h=>h.name):
+    Object.entries(ENGINE.HERO).filter(([_,h])=>h[0]===p.role).map(([name])=>name);
+  for(const hero of allowed)choices.add(new Option(hero,hero));
+  choices.value=p.hero;
+  choices.title=allowed.length+' legal '+p.role+' heroes for '+game.teams[0].season;
   choices.onchange=()=>{if(ENGINE.heroSwap(game,0,i,choices.value)){persist();paint()}};
   row.append(tag,choices);list.append(row);
  });root.append(list);
- const verified=ROSTERS.find(r=>r.name===game.teams[0].name);
+ const verified=window.RIVALRY_ROSTER_FOR?.(game.teams[0].name,game.teams[0].season);
  if(verified){
   const sub=node('div');sub.style.marginTop='13px';sub.append(node('div','rv-mini','SUBSTITUTION — verified squad'));
   const pick=node('select');pick.style.marginTop='8px';pick.style.maxWidth='100%';
@@ -292,7 +299,7 @@ function renderProfiles(){
  const selected=TEAMS[profileIndex];const team=matching.includes(selected)?selected:matching[0];const profile=$('#rv-profile');profile.replaceChildren();
  if(!team)return;
  profile.append(node('div','rv-eyebrow','SOURCE-BACKED TEAM PROFILE'),node('h2','rv-hub-title',team.name));
- const roster=ROSTERS.find(x=>x.name===team.name);
+ const roster=window.RIVALRY_ROSTER_FOR?.(team.name,team.year||Number((team.name.match(/·\s*(20\d{2})$/)||[])[1])||2026);
  const meta=node('div','rv-profile-meta');
  for(const x of [team.region||'UNKNOWN',roster?('VERIFIED '+roster.season+' ROSTER'):'ROLE DATA NOT VERIFIED',team.era||'OWCS'])meta.append(node('span','rv-pill',x));
  profile.append(meta);
@@ -300,7 +307,7 @@ function renderProfiles(){
  else{
   const grid=node('div','rv-roster-grid');
   roster.players.forEach(p=>{
-   const card=node('div','rv-member'),img=portraitNode(p.heroes[0]),info=node('div');
+   const card=node('div','rv-member'),img=portraitNode(p.heroes?.[0]||'Overwatch'),info=node('div');
    info.append(node('strong','',p.name),node('span','',p.role+' · '+(p.country||'Nationality unverified')));
    card.append(img,info);grid.append(card);
   });profile.append(grid);
@@ -308,7 +315,7 @@ function renderProfiles(){
   const a=node('a','rv-tool','VERIFY ROSTER ↗');a.href=roster.source;a.target='_blank';a.rel='noopener noreferrer';profile.append(a);
  }
  const button=node('button','rv-tool accent','SIMULATE THIS TEAM');
- button.style.marginLeft='8px';button.onclick=()=>{const opponent=team.name==='Twisted Minds'?'ZETA DIVISION':'Twisted Minds';launch(team.name,opponent,{best:5,rules:roster?.season<=2021?'classic':'modern'});picker();renderCommands()};
+ button.style.marginLeft='8px';button.onclick=()=>{const opponent=team.name==='Twisted Minds'?'ZETA DIVISION':'Twisted Minds';launch(team.name,opponent,{best:5,seasonA:roster?.season||team.year||2026,seasonB:2026,rules:roster?.season<=2021?'modern':'modern'});picker();renderCommands()};
  profile.append(button);
 }
 function simulateQuick(a,b,best,seed){
@@ -419,6 +426,17 @@ function hook(){
  });
 }
 hook();renderCommands();renderTournament();
-if(game&&game.v===2){openStudio('match');picker();loadPortraits()}
+if(game&&game.v===2){
+  // Previous builds stored the correct team name but often resolved every roster as 2026.
+  // Start a clean replayable session with properly dated players, not stale OPEN slots.
+  const old=game;game=ENGINE.create({
+    a:old.teams[0].name,b:old.teams[1].name,
+    seasonA:Number((old.teams[0].name.match(/·\s*(20\d{2})$/)||[])[1]||old.teams[0].season||2026),
+    seasonB:Number((old.teams[1].name.match(/·\s*(20\d{2})$/)||[])[1]||old.teams[1].season||2026),
+    rules:old.rules,best:old.best,seed:old.seed,maps:old.mapList
+  });
+  persist();
+}
+if(game&&game.v>=3){openStudio('match');picker();loadPortraits()}
 window.RIVALRY_STUDIO=Object.freeze({launch,open:openStudio,close:closeStudio,state:()=>game});
 })();
