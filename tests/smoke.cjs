@@ -11,7 +11,7 @@ async function main(){
  w.alert=()=>{};
  const errors=[];
  w.addEventListener('error',e=>{errors.push(e.message);e.preventDefault()});
- for(const path of ['teams.js','archive.js','data/pacific-2026.js','app.js','archive-ui.js','data/verified-rosters.js','data/stage3-rosters.js','engine/overwatch-sim.js','studio.js']){
+ for(const path of ['teams.js','archive.js','data/pacific-2026.js','app.js','archive-ui.js','data/verified-rosters.js','data/stage3-rosters.js','data/historical-lineups.js','engine/overwatch-sim.js','data/heroes-2026.js','studio.js','data/season-selector.js','data/hero-gallery.js']){
   const src=fs.readFileSync(path,'utf8');
   try{w.eval(src)}catch(e){throw Error(path+': '+e.stack)}
  }
@@ -19,7 +19,26 @@ async function main(){
  assert.ok(w.RIVALRY_ENGINE,'Engine module is loaded');
  assert.ok(w.RIVALRY_STUDIO,'Studio module is loaded');
  assert.equal(w.RIVALRY_OWCS.length,115,'Curated historical and 2026 archive imported');
- assert.ok(w.RIVALRY_VERIFIED_ROSTERS.length>=20,'Dated player snapshots are loaded');
+ assert.ok(w.RIVALRY_VERIFIED_ROSTERS.length>=35,'Dated player snapshots are loaded');
+ assert.equal(w.RIVALRY_HERO_CATALOG.all().length,54,'All 54 playable heroes are indexed');
+ assert.equal(w.RIVALRY_HERO_CATALOG.roleAt('Sombra',2025),'Damage','Historic Damage Sombra');
+ assert.equal(w.RIVALRY_HERO_CATALOG.roleAt('Sombra',2026),'Support','Current Support Sombra');
+ assert.ok(!w.RIVALRY_HERO_CATALOG.legal('Doctrine',2025),'Future heroes are excluded from past seasons');
+ assert.ok(w.RIVALRY_HERO_CATALOG.legal('Doctrine',2026),'Doctrine available in 2026');
+ assert.ok(w.RIVALRY_HERO_CATALOG.atYear(2026,'Support').some(h=>h.name==='Jetpack Cat'),'2026 Jetpack Cat available');
+ assert.ok(w.document.querySelector('#season-a')?.options.length>=1,'Season selectors mounted');
+ assert.ok(w.document.querySelector('#season-b')?.options.length>=1,'Opponent season selector mounted');
+ assert.equal(w.RIVALRY_ROSTER_FOR('Crazy Raccoon',2024)?.players.some(p=>p.name==='shu'),true,'2024 CR retains shu');
+ assert.equal(w.RIVALRY_ROSTER_FOR('Crazy Raccoon',2026)?.players.some(p=>p.name==='vigilante'),true,'2026 CR has vigilante');
+ assert.equal(w.RIVALRY_ROSTER_FOR('Crazy Raccoon',2024)?.players.some(p=>p.name==='vigilante'),false,'2026 transfer not backdated');
+ const oldCR=w.RIVALRY_ENGINE.create({a:'Crazy Raccoon · 2024',b:'Team Falcons · 2024',seasonA:2024,seasonB:2024,best:3,seed:19});
+ assert.equal(oldCR.teams[0].players.filter(p=>p.verified).length,5,'2024 CR match uses five named historical players');
+ assert.equal(oldCR.teams[0].players[0].name,'JunBin','Historical tank identified');
+ assert.ok(!oldCR.teams[0].players.some(p=>p.name==='vigilante'),'2026 player not inserted into 2024 match');
+ const ow2019=w.RIVALRY_ENGINE.create({a:'San Francisco Shock · OWL',b:'London Spitfire · 2018',seasonA:2019,seasonB:2018,rules:'classic',seed:72});
+ assert.equal(ow2019.teams[0].players.length,6,'6v6 historical roles');
+ assert.equal(ow2019.teams[0].players.filter(p=>p.verified).length,6,'OWL alias resolves exact 2019 roster');
+ assert.equal(ow2019.teams[0].players.every(p=>p.hero!=='Sojourn'),true,'Future heroes absent from 2019 match');
  assert.equal(w.RIVALRY_ROSTER_FOR('Team Liquid').players.find(p=>p.name==='UltraViolet')?.role,'Support','Current Team Liquid support transfer mapped');
  assert.equal(w.RIVALRY_ROSTER_FOR('Spacestation Gaming').players.find(p=>p.name==='Galaa')?.role,'Support','Stage 3 Spacestation support roster mapped');
  const count=w.document.querySelectorAll('#directory-grid .directory-card').length;
@@ -29,6 +48,13 @@ async function main(){
  assert.ok(w.document.querySelector('#rivalry-studio').classList.contains('open'),'Studio launches from Overwatch match form');
  assert.ok(w.document.querySelectorAll('#rv-roster-a .rv-player').length===5,'Five-player team rendered');
  assert.ok(w.document.querySelectorAll('#rv-roster-b .rv-player').length===5,'Opponent five-player lineup rendered');
+ assert.ok(w.RIVALRY_STUDIO.state().teams[0].players.every(p=>p.verified),'Available 2026 roster is filled, no OPEN slots');
+ w.document.querySelector('[data-tab="heroes"]').click();
+ assert.equal(w.document.querySelectorAll('.rv-hero-profile').length,54,'54 hero gallery cards');
+ w.document.querySelector('#rv-hero-year').value='2019';
+ w.document.querySelector('#rv-hero-year').dispatchEvent(new w.Event('input',{bubbles:true}));
+ assert.ok(!w.document.querySelector('#rv-hero-grid').textContent.includes('Doctrine'),'Historical filter hides 2026-only heroes');
+ w.document.querySelector('[data-tab="match"]').click();
  const t0=w.RIVALRY_STUDIO.state().tick;
  w.document.querySelector('#rv-step').click();
  assert.equal(w.RIVALRY_STUDIO.state().tick,t0+1,'Manual step advances engine exactly once');
@@ -59,6 +85,6 @@ async function main(){
  const unknown=w.RIVALRY_ENGINE.create({a:'Team Peps',b:'VARREL',best:3,seed:71});
  assert.ok(unknown.teams[0].players.every(p=>p.verified===false),'Unverified players are not fictional real names');
  w.close();
- console.log('PASS: boot, team database, 5v5, combat events, killfeed source, stats, timeline, profiles, tournaments, 6v6 and missing-data safety.');
+ console.log('PASS: exact-year rosters, 54 heroes, historic release restrictions, 2026 role changes, 5v5, 6v6, gallery, live simulation, and tournament.');
 }
 main().catch(err=>{console.error(err);process.exitCode=1});
