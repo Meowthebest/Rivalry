@@ -11,7 +11,7 @@
 const H=window.RIVALRY_ENGINE?.HERO;
 if(!H)return;
 const tank=[
- ['D.Mon',2026,'Self-Destruct','Defense Matrix'],
+ ['D.Mon',2026,'Limit Break','Power Barrier'],
  ['D.Va',2016,'Self-Destruct','Defense Matrix'],
  ['Domina',2026,'Panopticon','Barrier Array'],
  ['Doomfist',2017,'Meteor Strike','Rocket Punch'],
@@ -28,7 +28,7 @@ const tank=[
  ['Zarya',2016,'Graviton Surge','Particle Barrier']
 ];
 const damage=[
- ['Anran',2026,'Vermilion Ascent','Inferno Rush'],
+ ['Anran',2026,'Vermillion Ascent','Inferno Rush'],
  ['Ashe',2018,'B.O.B.','Coach Gun'],
  ['Bastion',2016,'Configuration: Artillery','Tactical Grenade'],
  ['Cassidy',2016,'Deadeye','Combat Roll'],
@@ -41,8 +41,8 @@ const damage=[
  ['Mei',2016,'Blizzard','Ice Wall'],
  ['Pharah',2016,'Barrage','Concussive Blast'],
  ['Reaper',2016,'Death Blossom','Wraith Form'],
- ['Shion',2026,'Ultimate','Evade'],
- ['Sierra',2026,'Ultimate','Recon'],
+ ['Shion',2026,'Satsuriku Spree','Evade'],
+ ['Sierra',2026,'Trailblazer','Anchor Drone'],
  ['Sojourn',2022,'Overclock','Power Slide'],
  ['Soldier: 76',2016,'Tactical Visor','Biotic Field'],
  ['Symmetra',2016,'Photon Barrier','Teleporter'],
@@ -58,16 +58,16 @@ const support=[
  ['Brigitte',2018,'Rally','Repair Pack'],
  ['Doctrine',2026,'Deliverance','Invigorating Drones'],
  ['Illari',2023,'Captive Sun','Healing Pylon'],
- ['Jetpack Cat',2026,'Ultimate','Flight'],
+ ['Jetpack Cat',2026,'Catnapper','Frenetic Flight'],
  ['Juno',2024,'Orbital Ray','Hyper Ring'],
  ['Kiriko',2022,'Kitsune Rush','Protection Suzu'],
  ['Lifeweaver',2023,'Tree of Life','Life Grip'],
  ['Lucio',2016,'Sound Barrier','Amp It Up'],
  ['Mercy',2016,'Valkyrie','Resurrect'],
- ['Mizuki',2026,'Ultimate','Ability'],
+ ['Mizuki',2026,'Kekkai Sanctuary','Healing Kasa'],
  ['Moira',2017,'Coalescence','Fade'],
  ['Sombra',2016,'EMP','Cyberspace'],
- ['Wuyang',2025,'Ultimate','Healing Stream'],
+ ['Wuyang',2025,'Guardian Wave','Restorative Stream'],
  ['Zenyatta',2016,'Transcendence','Discord Orb']
 ];
 const definitions={},release={};
@@ -75,7 +75,7 @@ for(const [role,list,hp] of [['Tank',tank,640],['Damage',damage,250],['Support',
  for(const [name,year,ult,ability] of list){
    // Specific values are intentionally gameplay approximations.
    const existing=H[name];H[name]=[role,existing?.[1]||hp,ult,ability,existing?.[4]||1];
-   definitions[name]={name,role,year,ultimate:ult,ability,slug:name==='Lucio'?'lucio':name.toLowerCase().replace(/[^a-z0-9]+/g,'-')};
+   definitions[name]={name,role,year,ultimate:ult,ability,slug:name==='Lucio'?'lucio':name==='D.Mon'?'dmon':name.toLowerCase().replace(/[^a-z0-9]+/g,'-')};
    release[name]=year;
  }
 }
