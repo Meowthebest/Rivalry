@@ -8,7 +8,7 @@ if(!ENGINE)return;
 const KEY='rivalry.owstudio.v2',HISTORY='rivalry.owstudio.history.v2',TOURNAMENT='rivalry.owstudio.tourney.v2';
 const $=s=>document.querySelector(s);
 const node=(tag,cls='',str)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(str!==undefined)e.textContent=str;return e};
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;':'&quot;',"'":'&#39;'}[c]));
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}};
 const fmt=n=>{const v=Math.max(0,Math.ceil(n));return Math.floor(v/60)+':'+String(v%60).padStart(2,'0')};
