@@ -137,8 +137,8 @@ function renderLineups(){
     for(let i=0;i<comp.roles.length;i++){
       const role=comp.roleNames?.[i]||(i===0?'TANK':i<=2?'DAMAGE':'SUPPORT');
       const cell=node('div','hero-cell '+role.toLowerCase());
-      cell.title=comp.roles[i]+' · '+role+' · click to inspect hero';
-      cell.dataset.hero=comp.roles[i];
+      cell.title=comp.roles[i]+' · '+role+' · press Enter to inspect hero';
+      cell.dataset.hero=comp.roles[i];cell.tabIndex=0;cell.setAttribute('role','button');cell.setAttribute('aria-label','Inspect '+comp.roles[i]+' hero dossier');
       const glyph=node('div','role-symbol',role==='TANK'?'⬡':role==='DAMAGE'?'✣':'✚');
       const info=node('div','hero-info'),player=node('span','',lineup[i]||('Simulated '+role.toLowerCase()+' '+(i+1))),hero=node('strong','',comp.roles[i]),roleText=node('small','',role);
       info.append(player,hero,roleText);cell.append(glyph,info);list.append(cell);
