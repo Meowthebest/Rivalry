@@ -11,7 +11,12 @@ sources = [
   '2024-owcs-world-finals','2025-owcs-world-finals','2026-owcs-midseason-championship']],
  'https://www.over.gg/teams/overwatch-league/',
  'https://www.over.gg/team/630/san-francisco-shock',
- 'https://www.over.gg/team/635/london-spitfire'
+ 'https://www.over.gg/team/635/london-spitfire',
+ *['https://owtics.gg/en-US/esports/team/'+x for x in [
+  'seoul-infernal','vegas-eternal','ex-oblivione','peace-and-love','timeless','m80',
+  'students-of-the-game','citrus-nation','tsm','fluffy-aimers','yeti','insomnia',
+  'nyam-gaming','bleed-esports','honeypot','daf','the-ultimates','sakura-esports',
+  'reject','nosebleed-esports','wae','geng-esports','rankers','canthear','retirement-home']]
 ]
 rows, failures = [], []
 for source in sources:
