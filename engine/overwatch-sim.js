@@ -38,9 +38,11 @@ function clamp(x,a,b){return Math.max(a,Math.min(b,x))}
 function hash(s){let h=2166136261;for(const c of String(s)){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
 function createRandom(seed){let state=(seed||1)>>>0;const next=()=>{state^=state<<13;state^=state>>>17;state^=state<<5;return (state>>>0)/4294967296};return{next,read:()=>state>>>0}}
 function makeLineup(name,year,classic,picks,seed){
- const db=(window.RIVALRY_VERIFIED_ROSTERS||[]).find(x=>x.name.toLowerCase()===name.toLowerCase());
- let pool=db?db.players:[];
- const old=(window.RIVALRY_OWCS||[]).find(x=>x.name===name);
+ const yearNum=Number(year)||2026;
+ const db=window.RIVALRY_ROSTER_FOR?.(name,yearNum)||null;
+ const pool=db?.players||[];
+ const catalog=window.RIVALRY_HERO_CATALOG;
+ const heroRole=(hero)=>catalog?.roleAt(hero,yearNum)||HERO[hero]?.[0];
  const required=classic?['Tank','Tank','Damage','Damage','Support','Support']:['Tank','Damage','Damage','Support','Support'];
  const used=new Set();let known=0;
  return required.map((role,index)=>{
@@ -51,8 +53,13 @@ function makeLineup(name,year,classic,picks,seed){
   const preset=role==='Tank'?(classic?['Winston','D.Va']:['Sigma','Winston']):
                role==='Damage'?['Sojourn','Tracer','Genji','Hanzo']:
                ['Ana','Lucio','Juno','Baptiste'];
-  const heroName=picks?.[index]||raw?.heroes?.[0]||preset[(seed+index)%preset.length];
-  const hero=HERO[heroName]||HERO[preset[0]];
+  const allowed=Object.keys(HERO).filter(hero=>
+    heroRole(hero)===role&&(!catalog||catalog.legal(hero,yearNum)));
+  // A chosen hero and a hero suggestion must both exist and be era-eligible.
+  const pref=[picks?.[index],...(raw?.heroes||[]),...preset];
+  const heroName=pref.find(hero=>hero&&allowed.includes(hero))||
+    allowed[(seed+index)%allowed.length];
+  const hero=HERO[heroName];
   const skill=clamp(.77+(hash(name+'/'+year+'/'+key)%250)/1000,.70,1.05);
   return {id:role+'-'+index+'-'+(hash(name+key)%100000),name:raw?.name||('OPEN '+role.toUpperCase()+' SLOT '+(index+1)),sourceName:raw?.name||null,role,
     country:raw?.country||null,hero:heroName,verified:!!raw,skill,proficiency:clamp(.81+(hash(key+heroName)%180)/1000,.78,1),
@@ -68,12 +75,20 @@ function create(opts={}){
  const best=[3,5,7].includes(Number(opts.best))?Number(opts.best):5;
  const mapList=Array.isArray(opts.maps)&&opts.maps.length?opts.maps:maps.map(x=>x[0]);
  const getMeta=name=>maps.find(m=>m[0]===name)||[name,'Hybrid',''];
- const rosterA=makeLineup(opts.a||'Twisted Minds',opts.seasonA||2026,rules==='classic',opts.heroesA,seed);
- const rosterB=makeLineup(opts.b||'ZETA DIVISION',opts.seasonB||2026,rules==='classic',opts.heroesB,seed+17);
- const roster=(name,players,season)=>({name,season,players,color:(window.RIVALRY_TEAM_STYLE||{})[name]?.primary||'#8fb7ea',
-  verified:(window.RIVALRY_VERIFIED_ROSTERS||[]).some(x=>x.name===name)});
- const data={v:2,seed,rand:seed||1,best,rules,teams:[roster(opts.a||'Twisted Minds',rosterA,opts.seasonA||2026),
-   roster(opts.b||'ZETA DIVISION',rosterB,opts.seasonB||2026)],score:[0,0],
+ const extractYear=(name)=>Number((String(name).match(/·\\s*(20\\d{2})$/)||[])[1]||0);
+ const yearA=Number(opts.seasonA||extractYear(opts.a)||2026);
+ const yearB=Number(opts.seasonB||extractYear(opts.b)||2026);
+ const rosterA=makeLineup(opts.a||'Twisted Minds',yearA,rules==='classic',opts.heroesA,seed);
+ const rosterB=makeLineup(opts.b||'ZETA DIVISION',yearB,rules==='classic',opts.heroesB,seed+17);
+ const roster=(name,players,season)=>{
+  const snapshot=window.RIVALRY_ROSTER_FOR?.(name,season)||null;
+  return {name,season,players,color:(window.RIVALRY_TEAM_STYLE||{})[name]?.primary||'#8fb7ea',
+   verified:!!snapshot&&players.every(p=>p.verified),
+   rosterSource:snapshot?.source||null,rosterLabel:snapshot?.label||null,
+   rosterCoverage:players.filter(p=>p.verified).length+'/'+players.length};
+ };
+ const data={v:2,seed,rand:seed||1,best,rules,teams:[roster(opts.a||'Twisted Minds',rosterA,yearA),
+   roster(opts.b||'ZETA DIVISION',rosterB,yearB)],score:[0,0],
   mapList,mapIndex:0,map:mapList[0],mode:getMeta(mapList[0])[1],
   clock:240,elapsed:0,tick:0,progress:[0,0],overtimeTicks:0,attacker:0,contest:false,overtime:false,
   strategy:['hold','hold'],momentum:0,priority:null,combo:false,comboTtl:[0,0],
@@ -283,15 +298,20 @@ function nextMap(s){
 }
 function heroSwap(s,side,index,hero){
  const player=s.teams[side]?.players[index];if(!player||!HERO[hero])return false;
- if(HERO[hero][0]!==player.role)return false;
+ const year=s.teams[side]?.season||2026;
+ const catalog=window.RIVALRY_HERO_CATALOG;
+ if(catalog && (!catalog.legal(hero,year)||catalog.roleAt(hero,year)!==player.role))return false;
+ if(!catalog && HERO[hero][0]!==player.role)return false;
  player.hero=hero;player.maxHp=HERO[hero][1];player.hp=player.maxHp;player.ult=Math.round(player.ult*.6);
  emit(s,'swap',{side,player:player.name,hero,detail:player.name+' swaps to '+hero+'.',important:true});return true;
 }
 function substitute(s,side,index,rawPlayer){
  const team=s.teams[side];const old=team?.players[index];
  if(!old||!rawPlayer||rawPlayer.role!==old.role)return false;
+ const snapshot=window.RIVALRY_ROSTER_FOR?.(team.name,team.season);
+ if(!snapshot||!snapshot.players.some(p=>p.name===rawPlayer.name&&p.role===rawPlayer.role))return false;
  if(team.players.some((p,i)=>i!==index&&p.name===rawPlayer.name))return false;
- const hero=old.hero;const init=makeLineup(team.name,team.season,s.rules==='classic',null,s.seed)[0];
+ const hero=old.hero;const init=makeLineup(team.name,team.season,s.rules==='classic',null,s.seed)[index];
  const replacement={...init,...old,name:rawPlayer.name,sourceName:rawPlayer.name,country:rawPlayer.country,verified:true,
   hp:old.maxHp,alive:true,respawn:0,ult:0,kills:0,deaths:0,assists:0,damage:0,healing:0,mitigated:0};
  team.players[index]=replacement;emit(s,'sub',{side,player:rawPlayer.name,detail:rawPlayer.name+' substitutes in for '+old.name+' ('+old.role+').',important:true});return true;
