@@ -182,14 +182,15 @@ function fightTick(s,dt){
   const alive=[...active(s,side)];if(!alive.length)continue;
   for(const p of alive){
    if(!p.alive)continue;
-   if(p.ult>=100 && (s.strategy[side]==='combo'||s.combo)){
-     tryUlt(s,side,p,true);s.combo=false;
+   if(p.ult>=100 && s.strategy[side]==='combo'){
+     const partners=active(s,side).filter(x=>x.ult>=100).length;
+     tryUlt(s,side,p,partners>=2 && rand(s)<.18);
    }else if(p.ult>=100)tryUlt(s,side,p,false);
    if(p.role==='Support'&&rand(s)<.37)continue;
    const target=chooseTarget(s,side,p);if(!target)continue;
    const base=p.role==='Damage'?41:p.role==='Tank'?30:19;
    const strategyMod={poke:p.role==='Damage'?1.18:.9,dive:target.role==='Support'?1.22:.91,
-    rush:p.role==='Tank'?1.24:1.04,hold:.92,combo:1.13}[s.strategy[side]]||1;
+    rush:p.role==='Tank'?1.24:1.04,hold:.92,combo:1.02}[s.strategy[side]]||1;
    const hitChance=clamp(.53+p.skill*.13+(s.strategy[side]==='poke'?.08:0),.42,.87);
    if(rand(s)>hitChance)continue;
    const crit=p.role==='Damage'&&rand(s)<(p.hero==='Widowmaker'?.30:.11);
@@ -208,7 +209,8 @@ function step(s,choice){
  s.tick++;s.elapsed+=dt;s.clock=Math.max(0,s.clock-dt);
  if(choice)s.strategy[0]=choice;
  const pressure=[livingWeight(s,0),livingWeight(s,1)];
- s.strategy[1]=pressure[1]<pressure[0]*.7?'hold':pick(s,['poke','hold','dive','rush']);
+ const readyOpp=s.teams[1].players.filter(p=>p.alive&&p.ult>=100).length;
+ s.strategy[1]=pressure[1]<pressure[0]*.7?'hold':readyOpp>=2&&rand(s)<.47?'combo':pick(s,['poke','hold','dive','rush','combo']);
  if(choice && rand(s)<.24)emit(s,'call',{side:0,detail:s.teams[0].name+' call '+choice.toUpperCase()+' positioning.'});
  fightTick(s,dt);
  const live=[active(s,0).length,active(s,1).length];
