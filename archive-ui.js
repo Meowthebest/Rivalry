@@ -12,6 +12,13 @@ const yearCounts=year=>year===2026?all.filter(t=>['EMEA','NA','Korea','Japan','C
 let activeYear=2019;
 const dir=$('#team-directory');
 if(!dir)return;
+const nav=document.querySelector('nav[aria-label="Main navigation"]');
+if(nav){
+  const a=E('button','nav-link','');a.innerHTML='<span>⌛</span> Overwatch history';
+  a.id='nav-archive';a.type='button';
+  a.addEventListener('click',()=>{document.querySelector('#nav-teams')?.click();setTimeout(()=>document.querySelector('#era-panel')?.scrollIntoView({behavior:'smooth',block:'start'}),90)});
+  nav.append(a);
+}
 const bar=E('section','era-panel');bar.id='era-panel';
 bar.innerHTML='<div class="era-topline"><div class="eyebrow">HISTORICAL ARCHIVE / 2018—2026</div><span class="era-tag">FANTASY TIME MACHINE</span></div><div class="era-hero"><div><div class="era-kicker">ONE GAME. EVERY ERA.</div><h2>REWRITE <em>HISTORY.</em></h2><p>What if the 2019 Shock faced today’s OWCS giants? Recreate the old rivalries, or invent the finals we never got.</p></div><div class="era-sigil" aria-hidden="true">OW<span>26</span></div></div><div class="era-tabs" id="era-year-tabs" aria-label="Historical season selector"></div><div id="era-season-content"></div><div class="era-source-foot">Historical team brands and event winners are sourced from Liquipedia and the Overwatch Wiki. Matches, lineups, ratings and tactical outcomes remain fictional. <a href="https://liquipedia.net/overwatch/Overwatch_League" target="_blank" rel="noopener noreferrer">OWL HISTORY ↗</a> <a href="https://liquipedia.net/overwatch/Overwatch_Champions_Series" target="_blank" rel="noopener noreferrer">OWCS HISTORY ↗</a></div>';
 dir.insertAdjacentElement('afterend',bar);
@@ -121,6 +128,10 @@ document.addEventListener('click',event=>{
  $('#hero-dialog-blurb').textContent=note[1]+' All match statistics are fictional.';
  $('#hero-dialog-link').href='https://overwatch.fandom.com/wiki/'+encodeURIComponent(hero.replaceAll(' ','_'));
  inspector.showModal();
+});
+document.addEventListener('keydown',event=>{
+  const cell=event.target.closest?.('.hero-cell[data-hero]');
+  if(cell&&(event.key==='Enter'||event.key===' ')){event.preventDefault();cell.click();}
 });
 const mapHint=E('span','map-source-tag','✦ ORIGINAL MAP ATLAS VISUALS');
 $('#arena-hero-strip')?.append(mapHint);
