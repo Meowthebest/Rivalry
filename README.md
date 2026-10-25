@@ -71,3 +71,17 @@ The `heroes` arrays in verified player snapshots are **scenario suggestions**, n
 - `.github/workflows/test.yml`: runs syntax and integration checks on each push.
 
 **Illustrative gameplay statistics are not official esports player data.**
+
+## Roster & Hero Database Update — October 25, 2026
+
+**Why OPEN slots appeared:** Earlier versions matched only a literal team name, did not carry the selected season through to the match engine, and often fell back to a 2026 roster query. The current build resolves **team + year** as a pair, offers separate year pickers for both opponents, previews all listed players (including benched players) and shows source links.
+
+- `data/historical-lineups.js` adds verified 2020, 2024 and 2025 event rosters and season-aware name resolution.
+- `data/asia-stage3-rosters.js` and `data/extra-rosters-2026.js` add source-backed Asian/EMEA OWCS Stage 3 rosters.
+- `data/season-selector.js` previews role groups and prevents silent historical roster substitutions. Generic OWL entries default to the newest sourced season when one exists.
+- `data/heroes-2026.js` catalogs **all 54 Overwatch heroes available as of October 25, 2026**, with approximate release-year eligibility, hero roles and selected ability labels. Sombra is Damage in earlier eras and Support after the October 2026 rework.
+- `data/hero-gallery.js` offers a searchable hero gallery with a role filter and playable-season filter; hero swaps in the spectator studio are constrained to heroes released by that team's chosen season.
+- Historical roster coverage is **partial**: a roster that isn't verified for a chosen year still displays **OPEN ROLE SLOT** rather than inventing a pro. The fact that a team is in the directory does not mean all of its annual players have been verified.
+
+Heroes/roles: [official Blizzard hero catalog](https://overwatch.blizzard.com/en-us/heroes/).
+Season-specific teams: [Liquipedia](https://liquipedia.net/overwatch/Main_Page).
