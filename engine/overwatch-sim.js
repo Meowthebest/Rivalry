@@ -54,7 +54,7 @@ function makeLineup(name,year,classic,picks,seed){
   const heroName=picks?.[index]||raw?.heroes?.[0]||preset[(seed+index)%preset.length];
   const hero=HERO[heroName]||HERO[preset[0]];
   const skill=clamp(.77+(hash(name+'/'+year+'/'+key)%250)/1000,.70,1.05);
-  return {id:role+'-'+index+'-'+(hash(name+key)%100000),name:raw?.name||'UNVERIFIED SLOT',sourceName:raw?.name||null,role,
+  return {id:role+'-'+index+'-'+(hash(name+key)%100000),name:raw?.name||('OPEN '+role.toUpperCase()+' SLOT '+(index+1)),sourceName:raw?.name||null,role,
     country:raw?.country||null,hero:heroName,verified:!!raw,skill,proficiency:clamp(.81+(hash(key+heroName)%180)/1000,.78,1),
     hp:hero[1],maxHp:hero[1],alive:true,respawn:0,ult:Math.floor((hash(key)%25)),cooldown:0,
     kills:0,deaths:0,assists:0,damage:0,healing:0,mitigated:0,damageTaken:0,lastDamagers:{},streak:0};
@@ -75,7 +75,7 @@ function create(opts={}){
  const data={v:2,seed,rand:seed||1,best,rules,teams:[roster(opts.a||'Twisted Minds',rosterA,opts.seasonA||2026),
    roster(opts.b||'ZETA DIVISION',rosterB,opts.seasonB||2026)],score:[0,0],
   mapList,mapIndex:0,map:mapList[0],mode:getMeta(mapList[0])[1],
-  clock:240,elapsed:0,tick:0,progress:[0,0],attacker:0,contest:false,overtime:false,
+  clock:240,elapsed:0,tick:0,progress:[0,0],overtimeTicks:0,attacker:0,contest:false,overtime:false,
   strategy:['hold','hold'],momentum:0,priority:null,combo:false,comboTtl:[0,0],
   status:'playing',lastWinner:null,events:[],killfeed:[],mapResults:[],snapshots:[],
   fight:{active:false,starts:0,elims:[0,0],lastEventAt:0},simulated:true};
@@ -84,7 +84,7 @@ function create(opts={}){
 function initMap(s){
  const m=maps.find(x=>x[0]===s.map);
  s.mode=m?.[1]||'Hybrid';s.clock=s.mode==='Control'?165:240;s.elapsed=0;s.progress=[0,0];s.overtime=false;
- s.contest=false;s.fight={active:false,starts:0,elims:[0,0],lastEventAt:0};s.strategy=['hold','hold'];s.comboTtl=[0,0];
+ s.contest=false;s.overtimeTicks=0;s.fight={active:false,starts:0,elims:[0,0],lastEventAt:0};s.strategy=['hold','hold'];s.comboTtl=[0,0];
  for(let side=0;side<2;side++)for(const p of s.teams[side].players){p.hp=p.maxHp;p.alive=true;p.respawn=0;p.cooldown=0;p.lastDamagers={};p.ult=Math.round(p.ult*.28);}
  emit(s,'map',{map:s.map,mode:s.mode,detail:'Map '+(s.mapIndex+1)+' begins: '+s.map+' ('+s.mode+').',important:true});
 }
@@ -187,10 +187,10 @@ function fightTick(s,dt){
    }else if(p.ult>=100)tryUlt(s,side,p,false);
    if(p.role==='Support'&&rand(s)<.37)continue;
    const target=chooseTarget(s,side,p);if(!target)continue;
-   const base=p.role==='Damage'?65:p.role==='Tank'?45:29;
+   const base=p.role==='Damage'?41:p.role==='Tank'?30:19;
    const strategyMod={poke:p.role==='Damage'?1.18:.9,dive:target.role==='Support'?1.22:.91,
     rush:p.role==='Tank'?1.24:1.04,hold:.92,combo:1.13}[s.strategy[side]]||1;
-   const hitChance=clamp(.62+p.skill*.14+(s.strategy[side]==='poke'?.08:0),.45,.91);
+   const hitChance=clamp(.53+p.skill*.13+(s.strategy[side]==='poke'?.08:0),.42,.87);
    if(rand(s)>hitChance)continue;
    const crit=p.role==='Damage'&&rand(s)<(p.hero==='Widowmaker'?.30:.11);
    const amount=base*(.66+rand(s)*.65)*p.skill*p.proficiency*strategyMod*(crit?1.75:1)* (s.comboTtl[side]>0?1.2:1)*dt/3.2;
@@ -227,9 +227,14 @@ function step(s,choice){
    endMap(s,s.progress[0]>=100?0:1,'objective');
  }
  if(s.clock<=0&&s.status==='playing'){
-  if(s.contest&&!s.overtime){s.overtime=true;emit(s,'overtime',{detail:'OVERTIME! The objective remains contested.',important:true});}
-  else if(!s.contest)endMap(s,s.progress[0]>=s.progress[1]?0:1,'time');
-  else s.clock=0;
+  if(s.contest&&!s.overtime){s.overtime=true;s.overtimeTicks=0;emit(s,'overtime',{detail:'OVERTIME! The objective remains contested.',important:true});}
+  else if(!s.contest){endMap(s,s.progress[0]>=s.progress[1]?0:1,'time');}
+  else{
+   s.overtimeTicks++;
+   // A protracted overtime resolves when one side loses the touch,
+   // or after an extended push, using objective percentage as the tie-break.
+   if(s.overtimeTicks>7||s.elapsed>310){endMap(s,s.progress[0]>=s.progress[1]?0:1,'overtime');}
+  }
  }
  s.killfeed=s.killfeed.filter(e=>e.expiresTick>=s.tick);
  return s;
