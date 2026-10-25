@@ -45,9 +45,9 @@ T('Dallas Fuel',2026,'https://owtics.gg/en-US/esports/tournament/2026-owcs-na-st
  P('Cjay','Support',us,['Baptiste','Ana']),P('Lukemino','Support',us,['Lucio','Juno'])
 ],{region:'NA'}),
 T('VARREL',2026,'https://eg-gear.com/owcs-devices-2026/',[
- P('KSG','Tank','JP',['Sigma','D.Va']),P('Nico','Damage','JP',['Tracer','Genji']),
- P('qki','Damage','JP',['Sojourn','Ashe']),P('TOPDRAGON','Damage',kr,['Genji','Mei']),
- P('Qloud','Support','JP',['Baptiste','Ana']),P('Sley','Support','JP',['Lucio','Juno'])
+ P('KSG','Tank',null,['Sigma','D.Va']),P('Nico','Damage',null,['Tracer','Genji']),
+ P('qki','Damage',null,['Sojourn','Ashe']),P('TOPDRAGON','Damage',null,['Genji','Mei']),
+ P('Qloud','Support',null,['Baptiste','Ana']),P('Sley','Support',null,['Lucio','Juno'])
 ],{region:'Japan',countryCaution:'Nationalities on this snapshot should be independently confirmed from individual player pages.'}),
 T('MURASH GAMING',2026,'https://eg-gear.com/owcs-devices-2026/',[
  P('PEPPI','Tank',null,['Sigma','Winston']),P('Viper','Damage',null,['Tracer','Genji']),P('ky0n','Damage',null,['Sojourn','Ashe']),
