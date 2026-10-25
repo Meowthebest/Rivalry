@@ -1,0 +1,17 @@
+
+/* Full era-aware 54 hero catalog */
+.rv-hero-toolbar{display:flex;align-items:end;gap:11px;flex-wrap:wrap;background:#121e2a;border:1px solid #374859;border-radius:8px;padding:15px;margin:15px 0}
+.rv-hero-toolbar label{font-size:10px;font-weight:900;color:#a7b8c6;letter-spacing:1px;display:flex;flex-direction:column;gap:6px}
+.rv-hero-toolbar input,.rv-hero-toolbar select{min-height:40px;background:#0b1420;color:#eef3fc;border:1px solid #3b5164;border-radius:6px;padding:9px 10px}
+.rv-hero-search{flex:1;min-width:150px}.rv-hero-search input{width:100%}
+.rv-hero-toolbar .rv-pill{margin:0 0 8px auto;white-space:nowrap}
+.rv-hero-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.rv-hero-profile{border:1px solid #32465a;background:#142231;border-radius:9px;overflow:hidden;transition:border-color .2s,transform .2s;min-width:0}
+.rv-hero-profile:hover{border-color:#dfad77;transform:translateY(-2px)}.rv-hero-profile[data-role="Tank"]{--hero-color:#e9ad78}.rv-hero-profile[data-role="Damage"]{--hero-color:#ef808d}.rv-hero-profile[data-role="Support"]{--hero-color:#83e8ca}
+.rv-hero-poster{aspect-ratio:1;display:grid;place-items:center;background:radial-gradient(circle at center,#385068,#1a2838);color:var(--hero-color);font:900 44px 'Barlow Condensed',Impact,sans-serif;border-bottom:3px solid var(--hero-color);overflow:hidden}
+.rv-hero-poster img{width:100%;height:100%;object-fit:cover}
+.rv-hero-profile-body{padding:13px 12px}.rv-hero-profile-body small{color:var(--hero-color);font-size:8px;letter-spacing:1px;font-weight:900}.rv-hero-profile-body h3{font:900 22px 'Barlow Condensed',Impact,sans-serif;margin:5px 0 7px;overflow-wrap:anywhere}.rv-hero-profile-body p{min-height:35px;color:#98abb9;font-size:10px;margin:0 0 9px;line-height:1.55}.rv-hero-profile-body a{color:#d5bd97;font-size:9px;font-weight:900;letter-spacing:.5px}
+.rv-hero-data-note{color:#a0b3c1;font-size:11px;line-height:1.7;background:#172331;border:1px solid #344758;padding:14px;border-radius:6px}.rv-hero-data-note a{color:#f2bc82;font-weight:900}
+@media(max-width:1300px){.rv-hero-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:820px){.rv-hero-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:520px){.rv-hero-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.rv-hero-profile-body{padding:10px}.rv-hero-poster{font-size:32px}.rv-hero-toolbar .rv-pill{margin-left:0}}
