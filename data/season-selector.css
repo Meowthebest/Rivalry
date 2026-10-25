@@ -1,0 +1,12 @@
+
+/* Season-correct roster selection */
+.rv-season-picker{grid-column:1/-1;margin:22px 0 3px;border:1px solid #405366;background:linear-gradient(150deg,#192938,#131e2b);padding:16px 19px;border-radius:9px}
+.rv-season-header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:13px}.rv-season-header strong{font:900 20px 'Barlow Condensed',sans-serif;letter-spacing:.7px;color:#f3f7fc}.rv-season-header span{display:block;color:#91a6b7;font-size:10px}
+.rv-season-chip{color:#aeea8c!important;background:#1d342b;border:1px solid #47634b;border-radius:5px;padding:5px 8px;font-size:9px!important;font-weight:900;letter-spacing:1px}
+.rv-season-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.rv-season-grid label{font-size:10px;font-weight:900;letter-spacing:.9px;color:#afc1cb}
+.rv-season-grid select{width:100%;margin:8px 0;background:#0d1a27;border:1px solid #42586c;color:#eef4fb;border-radius:6px;min-height:42px;padding:9px}
+.rv-season-note{font-size:10px;line-height:1.5;min-height:36px;letter-spacing:normal;font-weight:600}.rv-season-note.complete{color:#afeca5}.rv-season-note.incomplete{color:#f5ca94}.rv-season-note a{font-weight:900;color:#fedb9b;margin-left:8px}
+.rv-season-rosters{display:grid;grid-template-columns:1fr 1fr;gap:11px;padding-top:14px;margin-top:12px;border-top:1px solid #34485b}
+.rv-roster-preview{background:#101b28;border:1px solid #35485c;padding:11px;border-radius:6px;min-width:0}.rv-roster-preview>strong{font:900 16px 'Barlow Condensed',sans-serif;text-transform:uppercase;color:#f5d1a9}
+.rv-roster-preview-list p{margin:5px 0;color:#afc0cc;font-size:10px;line-height:1.6;overflow-wrap:anywhere}
+@media(max-width:660px){.rv-season-grid,.rv-season-rosters{grid-template-columns:1fr}.rv-season-picker{padding:12px}}
