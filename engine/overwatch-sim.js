@@ -87,7 +87,7 @@ function create(opts={}){
    rosterSource:snapshot?.source||null,rosterLabel:snapshot?.label||null,
    rosterCoverage:players.filter(p=>p.verified).length+'/'+players.length};
  };
- const data={v:2,seed,rand:seed||1,best,rules,teams:[roster(opts.a||'Twisted Minds',rosterA,yearA),
+ const data={v:3,seed,rand:seed||1,best,rules,teams:[roster(opts.a||'Twisted Minds',rosterA,yearA),
    roster(opts.b||'ZETA DIVISION',rosterB,yearB)],score:[0,0],
   mapList,mapIndex:0,map:mapList[0],mode:getMeta(mapList[0])[1],
   clock:240,elapsed:0,tick:0,progress:[0,0],overtimeTicks:0,attacker:0,contest:false,overtime:false,
