@@ -11,7 +11,7 @@ async function main(){
  w.alert=()=>{};
  const errors=[];
  w.addEventListener('error',e=>{errors.push(e.message);e.preventDefault()});
- for(const path of ['teams.js','archive.js','data/pacific-2026.js','app.js','archive-ui.js','data/verified-rosters.js','data/stage3-rosters.js','data/asia-stage3-rosters.js','data/historical-lineups.js','engine/overwatch-sim.js','data/heroes-2026.js','studio.js','data/season-selector.js','data/hero-gallery.js']){
+ for(const path of ['teams.js','archive.js','data/pacific-2026.js','app.js','archive-ui.js','data/verified-rosters.js','data/stage3-rosters.js','data/asia-stage3-rosters.js','data/extra-rosters-2026.js','data/historical-lineups.js','engine/overwatch-sim.js','data/heroes-2026.js','studio.js','data/season-selector.js','data/hero-gallery.js']){
   const src=fs.readFileSync(path,'utf8');
   try{w.eval(src)}catch(e){throw Error(path+': '+e.stack)}
  }
@@ -30,6 +30,8 @@ async function main(){
  assert.ok(w.document.querySelector('#season-b')?.options.length>=1,'Opponent season selector mounted');
  assert.equal(w.RIVALRY_ROSTER_FOR('Crazy Raccoon',2024)?.players.some(p=>p.name==='shu'),true,'2024 CR retains shu');
  assert.equal(w.RIVALRY_ROSTER_FOR('99DIVINE',2026)?.players.filter(p=>p.role==='Support').length,3,'Japanese Stage 3 bench slots loaded');
+ assert.ok(w.RIVALRY_ROSTER_FOR('Team Peps',2026).players.some(p=>p.name==='FDGod'),'2026 Team Peps support named');
+ assert.equal(w.RIVALRY_ENGINE.create({a:'Team Peps',b:'Team Risk',best:3,seed:218}).teams[0].players.filter(p=>p.verified).length,5,'2026 EMEA rivalry no OPEN slots');
  assert.equal(w.RIVALRY_ROSTER_FOR('JD Gaming',2026)?.players.length,4,'Incomplete verified roster keeps unresolved support slot rather than inventing');
  assert.equal(w.RIVALRY_ROSTER_FOR('Crazy Raccoon',2026)?.players.some(p=>p.name==='vigilante'),true,'2026 CR has vigilante');
  assert.equal(w.RIVALRY_ROSTER_FOR('Crazy Raccoon',2024)?.players.some(p=>p.name==='vigilante'),false,'2026 transfer not backdated');
