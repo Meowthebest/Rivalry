@@ -1,0 +1,54 @@
+
+/* Historical Overwatch era studio — original vector treatments, no copied game files */
+.era-panel,.era-rivalries,.source-wall{margin-top:28px;border:1px solid #364657;background:#121d29;border-radius:12px;overflow:hidden}
+.era-panel{background:radial-gradient(ellipse at 90% 0,#28423d55 0,transparent 50%),#101a26}
+.era-topline{padding:18px 26px 0;display:flex;justify-content:space-between;align-items:center;gap:15px}
+.era-tag{font-size:9px;color:#b9d69d;border:1px solid #4c6d51;border-radius:4px;padding:5px 9px;letter-spacing:1px;font-weight:900}
+.era-hero{display:flex;align-items:center;justify-content:space-between;padding:25px 34px 18px;gap:15px;min-height:230px;position:relative;overflow:hidden}
+.era-kicker{font-size:10px;letter-spacing:2.5px;font-weight:900;color:#f8b66a}
+.era-hero h2{font:900 clamp(43px,5.5vw,70px)/.95 var(--display);margin:9px 0;color:white}
+.era-hero h2 em{color:var(--lime);font-style:normal}
+.era-hero p{max-width:520px;font-size:12px;color:#9badbc;line-height:1.8}
+.era-sigil{font:900 105px/.7 var(--display);letter-spacing:-5px;color:#ffd18a;text-shadow:0 0 100px #ffc67429;transform:skew(-8deg);opacity:.85;white-space:nowrap}
+.era-sigil span{color:#a5fb51}
+.era-tabs{display:flex;gap:4px;padding:0 23px 19px;overflow-x:auto;scrollbar-width:thin;scrollbar-color:#526070 transparent}
+.era-year{background:#1d2935;border:1px solid #344756;color:#b2c0d0;padding:11px 16px;min-width:67px;border-radius:5px;font:900 16px var(--display);transition:.2s}
+.era-year:hover{border-color:#d6ad77}.era-year.selected{background:#ffae5b;border-color:#ffca8d;color:#151b21;box-shadow:0 0 28px #f6a65732}
+.era-season-main{border-top:1px solid #384654;padding:24px 26px 29px;background:#111c29}
+.era-season-head{display:flex;align-items:center;justify-content:space-between;gap:18px}
+.era-competition{font-size:10px;letter-spacing:1.3px;color:#ffbc80;font-weight:900}
+.era-season-head h3{font:900 38px var(--display);margin:0}
+.era-winner{text-align:right}.era-winner span{display:block;color:#90a4b5;font-size:9px;letter-spacing:1.3px;font-weight:900}.era-winner strong{color:#a9fc76;font:900 23px var(--display);text-transform:uppercase}
+.era-season-note{font-size:11px;color:#8fa3b5;margin:10px 0 20px}
+.era-team-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;max-height:440px;overflow:auto;scrollbar-color:#647580 #1c2835;scrollbar-width:thin}
+.era-team{border:1px solid #34495a;background:#1a2735;border-radius:7px;display:flex;align-items:center;gap:10px;padding:11px;min-width:0;transition:.2s}
+.era-team:hover{background:#24354a;border-color:#d8a572}.era-crest{flex:0 0 44px;height:44px;background:linear-gradient(150deg,#3b3d3d,#2a342f);clip-path:polygon(50% 0,95% 18%,95% 79%,50% 100%,5% 79%,5% 18%);color:#ffc180;font:900 16px var(--display);display:grid;place-items:center}
+.era-team-name{min-width:0;flex:1}.era-team-name strong{display:block;font:900 16px var(--display);text-transform:uppercase;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.era-team-name span{display:block;font-size:8px;color:#9dafbb;letter-spacing:.5px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.era-choose{flex:0 0 auto;border:1px solid #50745c;background:#1a3328;color:#acf785;font:900 10px var(--font);padding:8px;border-radius:5px}
+.era-choose:hover{background:#a5fb51;color:#132007}
+.era-source-foot{border-top:1px solid #303f50;color:#7f95a9;font-size:10px;padding:17px 26px;line-height:1.8}
+.era-source-foot a{display:inline-block;margin-left:12px;color:#d9b182;font-weight:900}
+.era-rivalries,.source-wall{padding:24px 28px}
+.era-rivalries h2,.source-wall h2{font:900 34px var(--display);margin:4px 0}
+.era-rivalries p,.source-wall p{font-size:11px;color:#92a4b6;margin:4px 0 17px;line-height:1.7}
+.era-rivals,.source-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.era-rivalry-card{background:linear-gradient(150deg,#24313c,#151e2a);border:1px solid #3a4d59;text-align:left;border-radius:7px;color:#fff;min-width:0;padding:16px;display:flex;flex-direction:column;align-items:start;gap:9px;transition:.2s}
+.era-rivalry-card:hover{border-color:#cba277;background:#263b40;transform:translateY(-2px)}
+.era-rivalry-card>span{font-size:9px;letter-spacing:1.4px;color:#a9bdc7;font-weight:900}
+.era-rivalry-card strong{font:900 20px/1.04 var(--display);text-transform:uppercase}
+.era-rivalry-card small{font-size:9px;color:#a8b9c4;flex:1}
+.era-rivalry-card i{font:900 10px var(--font);color:#b9f88e;letter-spacing:1px;font-style:normal}
+.source-links a{padding:15px;border:1px solid #344654;background:#192635;border-radius:7px;display:flex;flex-direction:column;gap:5px}
+.source-links a:hover{border-color:#d2aa7e}.source-links a b{color:#fcbb7f;font:900 17px var(--display)}.source-links a span{font-size:10px;color:#9badba;line-height:1.5}
+.archive-setting{margin-top:10px}
+.map-source-tag{position:absolute;right:18px;bottom:10px;font-size:9px;color:#fde0b3;opacity:.76;letter-spacing:1px;font-weight:900;pointer-events:none}
+.hero-cell[data-hero]{cursor:pointer;transition:transform .17s,border-color .17s}
+.hero-cell[data-hero]:hover{transform:translateY(-3px);border-color:#e5ad74}
+.rival-hero-dialog{max-width:510px;width:calc(100% - 40px);color:#eaf2fa;border:1px solid #536579;border-radius:11px;padding:0;background:radial-gradient(ellipse at right top,#36505a60,transparent),#131e2b;box-shadow:0 30px 110px #000b}
+.rival-hero-dialog::backdrop{background:#020812c7;backdrop-filter:blur(5px)}
+.hero-dialog-head{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;border-bottom:1px solid #405261;font-size:10px;color:#a7c4cf;font-weight:900;letter-spacing:1.2px}
+.hero-dialog-head button{background:transparent;border:0;color:#e7f1fa;font-size:20px}
+.hero-dialog-core{padding:30px;display:flex;align-items:center;gap:22px}.hero-dialog-badge{width:92px;height:92px;flex:0 0 92px;border:2px solid #ffa760;border-radius:16px;display:grid;place-items:center;font:900 39px var(--display);color:#ffb871;transform:skew(-4deg);background:#392b24}
+.hero-dialog-core h2{font:900 42px var(--display);margin:3px 0}.hero-dialog-core p{font-size:12px;color:#a7b9c8;line-height:1.7}.hero-dialog-source{display:block;margin:0 27px 24px;padding:11px;border:1px solid #536d4f;border-radius:6px;color:#b9f78d;text-align:center;font-size:11px;font-weight:900;letter-spacing:.7px}
+@media(max-width:1200px){.era-team-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.era-rivals,.source-links{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:680px){.era-hero{padding:25px 20px;min-height:190px}.era-sigil{font-size:59px;opacity:.4;position:absolute;right:5px;top:43px}.era-hero h2{font-size:50px}.era-topline{padding:17px 18px 0}.era-season-main{padding:19px 15px}.era-team-grid{grid-template-columns:1fr;max-height:480px}.era-tabs{padding:0 12px 15px}.era-season-head h3{font-size:30px}.era-winner strong{font-size:17px}.era-rivalries,.source-wall{padding:20px 17px}.era-rivals,.source-links{grid-template-columns:1fr}.era-source-foot{padding:13px 16px}.era-source-foot a{margin:5px 12px 0 0}.map-source-tag{display:none}}
