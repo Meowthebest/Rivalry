@@ -52,3 +52,9 @@
 .hero-dialog-core h2{font:900 42px var(--display);margin:3px 0}.hero-dialog-core p{font-size:12px;color:#a7b9c8;line-height:1.7}.hero-dialog-source{display:block;margin:0 27px 24px;padding:11px;border:1px solid #536d4f;border-radius:6px;color:#b9f78d;text-align:center;font-size:11px;font-weight:900;letter-spacing:.7px}
 @media(max-width:1200px){.era-team-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.era-rivals,.source-links{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:680px){.era-hero{padding:25px 20px;min-height:190px}.era-sigil{font-size:59px;opacity:.4;position:absolute;right:5px;top:43px}.era-hero h2{font-size:50px}.era-topline{padding:17px 18px 0}.era-season-main{padding:19px 15px}.era-team-grid{grid-template-columns:1fr;max-height:480px}.era-tabs{padding:0 12px 15px}.era-season-head h3{font-size:30px}.era-winner strong{font-size:17px}.era-rivalries,.source-wall{padding:20px 17px}.era-rivals,.source-links{grid-template-columns:1fr}.era-source-foot{padding:13px 16px}.era-source-foot a{margin:5px 12px 0 0}.map-source-tag{display:none}}
+
+/* Custom-built arena art: original vector design, not copied Blizzard material */
+.hero-feature{background-image:linear-gradient(100deg,#1623322b,#111e2b4d),url("./assets/arena.svg");background-size:cover;background-position:center;isolation:isolate}
+.hero-feature:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,#07141e35);pointer-events:none}
+.arena-hero-strip{background-image:linear-gradient(90deg,#111d2afa,#172735b5),url("./assets/arena.svg");background-size:cover;background-position:center}
+.era-team:focus-within,.era-rivalry-card:focus-visible,.hero-cell[data-hero]:focus-visible{outline:2px solid #a7fb55;outline-offset:2px}
