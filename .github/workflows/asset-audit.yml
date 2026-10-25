@@ -1,0 +1,25 @@
+name: Audit team icon sources
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - scripts/audit-public-assets.py
+      - .github/workflows/asset-audit.yml
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install beautifulsoup4==4.13.4
+      - run: python scripts/audit-public-assets.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: public-team-icon-audit
+          path: asset-audit.json
+          retention-days: 7
