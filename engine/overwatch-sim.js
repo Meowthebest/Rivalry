@@ -75,7 +75,7 @@ function create(opts={}){
  const best=[3,5,7].includes(Number(opts.best))?Number(opts.best):5;
  const mapList=Array.isArray(opts.maps)&&opts.maps.length?opts.maps:maps.map(x=>x[0]);
  const getMeta=name=>maps.find(m=>m[0]===name)||[name,'Hybrid',''];
- const extractYear=(name)=>Number((String(name).match(/·\\s*(20\\d{2})$/)||[])[1]||0);
+ const extractYear=(name)=>Number((String(name).match(/·\s*(20\d{2})$/)||[])[1]||0);
  const yearA=Number(opts.seasonA||extractYear(opts.a)||2026);
  const yearB=Number(opts.seasonB||extractYear(opts.b)||2026);
  const rosterA=makeLineup(opts.a||'Twisted Minds',yearA,rules==='classic',opts.heroesA,seed);
