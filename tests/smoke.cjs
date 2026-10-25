@@ -11,14 +11,14 @@ async function main(){
  w.alert=()=>{};
  const errors=[];
  w.addEventListener('error',e=>{errors.push(e.message);e.preventDefault()});
- for(const path of ['teams.js','archive.js','app.js','archive-ui.js','data/verified-rosters.js','engine/overwatch-sim.js','studio.js']){
+ for(const path of ['teams.js','archive.js','data/pacific-2026.js','app.js','archive-ui.js','data/verified-rosters.js','engine/overwatch-sim.js','studio.js']){
   const src=fs.readFileSync(path,'utf8');
   try{w.eval(src)}catch(e){throw Error(path+': '+e.stack)}
  }
  assert.equal(errors.length,0,'No bootstrap runtime errors: '+errors.join(' | '));
  assert.ok(w.RIVALRY_ENGINE,'Engine module is loaded');
  assert.ok(w.RIVALRY_STUDIO,'Studio module is loaded');
- assert.equal(w.RIVALRY_OWCS.length,109,'Curated historical and 2026 archive imported');
+ assert.equal(w.RIVALRY_OWCS.length,115,'Curated historical and 2026 archive imported');
  const count=w.document.querySelectorAll('#directory-grid .directory-card').length;
  assert.ok(count>=30,'Directory shows team cards');
  const start=w.document.querySelector('#start-match');assert.ok(start);
