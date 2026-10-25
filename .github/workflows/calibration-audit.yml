@@ -1,0 +1,43 @@
+name: Audit public simulation benchmarks
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.github/workflows/calibration-audit.yml']
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect public datasets without credentials
+        shell: python
+        run: |
+          import urllib.request, urllib.parse, pathlib, re, json, hashlib, zipfile, io
+          out=pathlib.Path('calibration-audit');out.mkdir(exist_ok=True)
+          urls=['https://owdb.io/data','https://owscouter.com/about','https://public.tableau.com/views/StatsLab-KeyStatistics/MatchReport.csv?:showVizHome=no']
+          audit=[]
+          for idx,url in enumerate(urls):
+            try:
+              req=urllib.request.Request(url,headers={'User-Agent':'RivalryCalibrationAudit/1.0 (https://github.com/Meowthebest/Rivalry)'})
+              with urllib.request.urlopen(req,timeout=25) as r: body=r.read(24000000);ct=r.headers.get('Content-Type','')
+              (out/('page-'+str(idx)+('.csv' if 'csv' in ct else '.html'))).write_bytes(body)
+              audit.append({'url':url,'bytes':len(body),'type':ct,'sha256':hashlib.sha256(body).hexdigest()})
+              if idx==0:
+                links=[urllib.parse.urljoin(url,x) for x in re.findall(r'href=[\"\x27]([^\"\x27]+)',body.decode('utf-8','replace'))]
+                for link in links:
+                  if urllib.parse.urlparse(link).hostname=='owdb.io' and ('.zip' in link or '.csv' in link):
+                    try:
+                      with urllib.request.urlopen(link,timeout=25) as r: data=r.read(24000000)
+                      name=pathlib.Path(urllib.parse.urlparse(link).path).name
+                      (out/name).write_bytes(data)
+                      audit.append({'url':link,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()})
+                    except Exception as exc: audit.append({'url':link,'error':str(exc)})
+            except Exception as exc: audit.append({'url':url,'error':str(exc)})
+          (out/'audit.json').write_text(json.dumps(audit,indent=2))
+          print(json.dumps(audit,indent=2))
+      - uses: actions/upload-artifact@v4
+        with:
+          name: calibration-source-audit
+          path: calibration-audit
+          retention-days: 7
