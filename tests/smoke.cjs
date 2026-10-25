@@ -11,7 +11,7 @@ async function main(){
  w.alert=()=>{};
  const errors=[];
  w.addEventListener('error',e=>{errors.push(e.message);e.preventDefault()});
- for(const path of ['teams.js','archive.js','data/pacific-2026.js','app.js','archive-ui.js','data/verified-rosters.js','engine/overwatch-sim.js','studio.js']){
+ for(const path of ['teams.js','archive.js','data/pacific-2026.js','app.js','archive-ui.js','data/verified-rosters.js','data/stage3-rosters.js','engine/overwatch-sim.js','studio.js']){
   const src=fs.readFileSync(path,'utf8');
   try{w.eval(src)}catch(e){throw Error(path+': '+e.stack)}
  }
@@ -19,6 +19,9 @@ async function main(){
  assert.ok(w.RIVALRY_ENGINE,'Engine module is loaded');
  assert.ok(w.RIVALRY_STUDIO,'Studio module is loaded');
  assert.equal(w.RIVALRY_OWCS.length,115,'Curated historical and 2026 archive imported');
+ assert.ok(w.RIVALRY_VERIFIED_ROSTERS.length>=20,'Dated player snapshots are loaded');
+ assert.equal(w.RIVALRY_ROSTER_FOR('Team Liquid').players.find(p=>p.name==='UltraViolet')?.role,'Support','Current Team Liquid support transfer mapped');
+ assert.equal(w.RIVALRY_ROSTER_FOR('Spacestation Gaming').players.find(p=>p.name==='Galaa')?.role,'Support','Stage 3 Spacestation support roster mapped');
  const count=w.document.querySelectorAll('#directory-grid .directory-card').length;
  assert.ok(count>=30,'Directory shows team cards');
  const start=w.document.querySelector('#start-match');assert.ok(start);
