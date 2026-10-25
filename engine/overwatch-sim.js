@@ -106,7 +106,7 @@ function elimination(s,side,attacker,target,kind='normal',assist=[]){
  for(const id of contributed){const a=s.teams[side].players.find(p=>p.id===id);if(a){a.assists++;assist.push(a.name)}}
  if(attacker){attacker.kills++;attacker.streak++;}
  const event=emit(s,'elimination',{side,killer:attacker?.name||null,killerHero:attacker?.hero||null,victim:target.name,victimHero:target.hero,
-  headshot:kind==='headshot',environmental:kind==='environment',self:kind==='self',assist:assist.slice(0,3),important:true});
+  headshot:kind==='headshot',environmental:kind==='environment',self:kind==='self',ability:kind==='ability'?HERO[attacker?.hero]?.[3]:kind==='ultimate'?HERO[attacker?.hero]?.[2]:null,assist:assist.slice(0,3),important:true});
  s.killfeed.unshift({...event,expiresTick:s.tick+5});
  s.killfeed=s.killfeed.slice(0,9);
  s.fight.elims[side]++;s.fight.lastEventAt=s.elapsed;
@@ -140,7 +140,7 @@ function damage(s,side,p,target,n,kind='normal'){
  p.damage+=amount;p.ult=clamp(p.ult+amount/(p.role==='Support'?36:29),0,100);
  target.hp-=amount;target.lastDamagers[p.id]=s.elapsed;
  for(const [id,t] of Object.entries(target.lastDamagers))if(s.elapsed-t>14)delete target.lastDamagers[id];
- if(target.hp<=0){const k=kind==='headshot'?'headshot':kind==='environment'?'environment':'normal';elimination(s,side,p,target,k);}
+ if(target.hp<=0){const k=['headshot','environment','ability','ultimate'].includes(kind)?kind:'normal';elimination(s,side,p,target,k);}
 }
 function heal(s,side,delta){
  const healers=active(s,side).filter(p=>p.role==='Support');
@@ -166,6 +166,15 @@ function chooseTarget(s,side,attacker){
   if(strategy==='poke'&&target.role==='Damage')val+=.28;
   if(val>score){score=val;best=target}
  }return best;
+}
+const PIT_MAPS=new Set(['Ilios','Lijiang Tower','Nepal','Busan','Colosseo','Oasis']);
+function selfElimination(s,side,p){
+ if(!p.alive)return;
+ p.hp=0;p.alive=false;p.deaths++;p.respawn=10;p.streak=0;
+ const event=emit(s,'elimination',{side,killer:p.name,killerHero:p.hero,victim:p.name,victimHero:p.hero,
+  headshot:false,environmental:false,self:true,assist:[],important:true,detail:p.name+' misjudges a mobility escape near the ledge.'});
+ s.killfeed.unshift({...event,expiresTick:s.tick+5});s.killfeed=s.killfeed.slice(0,9);
+ s.fight.elims[1-side]++;
 }
 function fightTick(s,dt){
  for(const side of [0,1]){
@@ -196,7 +205,21 @@ function fightTick(s,dt){
    const crit=p.role==='Damage'&&rand(s)<(p.hero==='Widowmaker'?.30:.11);
    const amount=base*(.66+rand(s)*.65)*p.skill*p.proficiency*strategyMod*s.form[side]*(crit?1.75:1)* (s.comboTtl[side]>0?1.2:1)*dt/3.2;
    damage(s,side,p,target,amount,crit?'headshot':'normal');
-   if(p.cooldown<=0 && p.role==='Damage' && rand(s)<.18){p.cooldown=7;const victim=chooseTarget(s,side,p);if(victim)damage(s,side,p,victim,32,'ability');emit(s,'ability',{side,player:p.name,hero:p.hero,ability:HERO[p.hero]?.[3]||'Ability'});}
+   if(p.cooldown<=0 && p.role==='Damage' && rand(s)<.18){
+    p.cooldown=7;const victim=chooseTarget(s,side,p);
+    if(victim)damage(s,side,p,victim,26,'ability');
+    emit(s,'ability',{side,player:p.name,hero:p.hero,ability:HERO[p.hero]?.[3]||'Ability'});
+    // Self-eliminations are extremely rare and require a ledge map, a mobility hero,
+    // an aggressive escape and low health. They are not uncaused random kill-feed entries.
+    if(PIT_MAPS.has(s.map)&&['Tracer','Genji'].includes(p.hero)&&p.hp<p.maxHp*.36&&rand(s)<.014){
+      selfElimination(s,side,p);continue;
+    }
+   }
+   if(PIT_MAPS.has(s.map)&&p.hero==='Lucio'&&p.cooldown<=0&&rand(s)<.04){
+    const victim=chooseTarget(s,side,p);
+    if(victim&&victim.alive&&rand(s)<.30){p.cooldown=11;elimination(s,side,p,victim,'environment');
+      emit(s,'environment',{side,player:p.name,detail:p.name+' scores an environmental Soundwave knockout!',important:true});}
+   }
   }
  }
  heal(s,0,dt/3.2);heal(s,1,dt/3.2);
