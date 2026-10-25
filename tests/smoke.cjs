@@ -48,6 +48,12 @@ async function main(){
  w.document.querySelector('#rv-tcreate').click();
  w.document.querySelector('#rv-trun').click();
  assert.ok(w.document.querySelector('#rv-bracket').textContent.includes('SEMIFINALS'),'Bracket rendered after simulation');
+ w.document.querySelector('[data-tab="match"]').click();
+ w.document.querySelector('#rv-full').click();
+ assert.equal(w.RIVALRY_STUDIO.state().status,'finished','Instant full-series simulation completes');
+ assert.ok(JSON.parse(w.localStorage.getItem('rivalry.owstudio.history.v2')).length>=1,'Full match saved as replay');
+ w.document.querySelector('[data-tab="replay"]').click();
+ assert.ok(w.document.querySelector('#rv-history').querySelector('button'),'Replay UI loads saved series');
  const seeded=w.RIVALRY_ENGINE.create({a:'San Francisco Shock · 2019',b:'Shanghai Dragons · 2021',rules:'classic',best:3,seed:77});
  assert.equal(seeded.teams[0].players.length,6,'Classic 6v6 team supported');
  const unknown=w.RIVALRY_ENGINE.create({a:'Team Peps',b:'VARREL',best:3,seed:71});
