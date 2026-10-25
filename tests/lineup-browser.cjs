@@ -5,6 +5,9 @@ const {JSDOM}=require('jsdom');
  const html=fs.readFileSync('index.html','utf8');
  const dom=new JSDOM(html,{url:'https://rivalry.test/',runScripts:'outside-only',pretendToBeVisual:true});
  const w=dom.window,errors=[];
+ // Track scheduled rendering so jsdom is not asked to paint a destroyed document.
+ const pendingFrames=new Set(),raf=w.requestAnimationFrame.bind(w),caf=w.cancelAnimationFrame.bind(w);
+ w.requestAnimationFrame=callback=>{const id=raf(time=>{pendingFrames.delete(id);callback(time)});pendingFrames.add(id);return id;};
  w.scrollTo=()=>{};w.HTMLElement.prototype.scrollIntoView=function(){};w.fetch=async()=>({ok:true,json:async()=>[]});w.alert=()=>{};
  w.addEventListener('error',e=>{errors.push(e.message);e.preventDefault()});
  const scripts=[...html.matchAll(/<script src="\.\/([^"?]+)(?:\?[^" ]*)?"><\/script>/g)].map(m=>m[1]);
@@ -42,6 +45,10 @@ const {JSDOM}=require('jsdom');
  // A legacy save is never silently relabelled with different players and the same event log.
  delete w.RIVALRY_STUDIO.state().lineupRevision;w.RIVALRY_LINEUP_UI.renderPanel(true);
  assert.ok($('#rv-lineup-config').textContent.includes('saved match predates'));
+ await next();
  assert.equal(errors.length,0,errors.join('\n'));
+ w.requestAnimationFrame=()=>0;
+ for(const id of pendingFrames)caf(id);
+ pendingFrames.clear();
  dom.window.close();console.log('PASS: Team2 stale-year regression, separate substitutions, player preferences, logos, missing-roster preflight, save migration notice');
 })().catch(e=>{console.error(e);process.exitCode=1});
