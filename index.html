@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<meta name="theme-color" content="#0a101a" />
+<meta name="description" content="RIVALRY — Play your dream esports matchups across Overwatch, VALORANT, League of Legends and Rocket League." />
+<title>Rivalry — Esports Match Simulator | OWCS 2026</title>
+<meta property="og:title" content="Rivalry — Esports Match Simulator" />
+<meta property="og:description" content="Your teams. Your match. Your calls." />
+<meta property="og:type" content="website" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-icon">R</div><div><div class="brand-name">RIV<span>ALRY</span></div><div class="brand-tag">ESPORTS SIMULATOR</div></div></div>
+    <nav aria-label="Main navigation">
+      <button class="nav-link active" id="nav-lobby"><span>◈</span> Simulator</button>
+      <button class="nav-link" id="nav-history"><span>▤</span> Match history</button>
+      <button class="nav-link" id="nav-teams"><span>⌘</span> Team directory</button>
+    </nav>
+    <div class="sidebar-group">SUPPORTED TITLES</div>
+    <div class="sidebar-game"><i style="--dot:#ffac5b"></i> Overwatch 2</div>
+    <div class="sidebar-game"><i style="--dot:#fa687a"></i> VALORANT</div>
+    <div class="sidebar-game"><i style="--dot:#8eaeff"></i> League of Legends</div>
+    <div class="sidebar-game"><i style="--dot:#62d4df"></i> Rocket League</div>
+    <div class="side-foot"><div><i class="online-dot"></i> 2026 STAGE 3</div><p><strong>37 verified OWCS teams</strong><br/>Across EMEA, North America, Korea, Japan &amp; China.</p></div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar"><div class="crumb" id="breadcrumb">RIVALRY <span>/</span> MATCH CREATOR</div><div class="top-right"><div><i class="online-dot"></i> ENGINE ONLINE</div><span class="alpha">2026 // STAGE 03</span></div></header>
+    <main class="main">
+      <section id="lobby" class="page active">
+        <div class="hero">
+          <div class="hero-content"><div class="eyebrow">ESPORTS FANTASY ENGINE <span class="label-sep">/</span> SEASON 2026</div><h1>EVERY MATCH.<br><em>YOUR CALL.</em></h1><p>Your dream grand final is one click away. Pick the teams, shape the game plan, and experience every clutch through a simulated live broadcast.</p><div class="hero-actions"><button id="hero-cta" class="btn primary">CREATE YOUR MATCH <span>↗</span></button><button class="btn hero-secondary" id="hero-owcs">EXPLORE OWCS TEAMS <span>↘</span></button></div><div class="hero-micro"><span><i></i> 37 STAGE 3 TEAMS</span><span>05 REGIONS</span><span>04 ESPORTS</span></div></div>
+          <div class="hero-feature"><div class="world-grid"></div><div class="hero-unit"><div class="hero-mark">◈</div><span class="hero-unit-tag">OVERWATCH // HERO FOCUS</span><strong>SOJOURN</strong><div class="hero-unit-sub">RAILGUN · OVERCLOCK · CARRY</div><div class="hero-role-line"><span>01 <b>TANK</b></span><span>02 <b>DAMAGE</b></span><span>02 <b>SUPPORT</b></span></div></div><div class="featured-match"><span>FEATURED RIVALRY</span><strong>TWISTED MINDS <b>VS</b> ZETA DIVISION</strong><small>BO7 · WORLD GRAND FINAL · FAN SIM</small></div></div>
+        </div>
+        <div class="section-title"><div><div class="eyebrow">01 / SELECT A TITLE</div><h2>CHOOSE YOUR ARENA</h2></div><div class="small-muted">4 titles available</div></div>
+        <div id="game-grid" class="game-grid"></div>
+        <div class="section-title" id="config-anchor"><div><div class="eyebrow">02 / MATCH SETTINGS</div><h2>BUILD YOUR MATCHUP</h2></div><div class="small-muted">No betting. Just simulation.</div></div>
+        <div class="config-layout"><div class="panel settings"><div class="panel-heading"><h3>MATCH CONFIGURATION</h3><span class="tag">CUSTOM MATCH</span></div>
+          <div class="team-inspector" id="team-inspector"><div><span class="tiny-head">OWCS 2026 STAGE 3</span><strong>CHOOSE YOUR RIVALRY</strong></div><div class="team-inspector-meta" id="team-inspector-meta">Verified team directory · 5 regions</div></div><div class="team-pair"><label class="form-field">YOUR TEAM<select id="team-a"></select><input id="custom-a" class="hidden" placeholder="Enter your team name" maxlength="44" /></label><button id="swap-teams" class="swap" title="Swap teams" aria-label="Swap teams">⇄</button><label class="form-field">OPPONENT<select id="team-b"></select><input id="custom-b" class="hidden" placeholder="Enter opponent name" maxlength="44" /></label></div>
+          <div class="settings-row"><label class="form-field">MATCH FORMAT<select id="match-format"></select></label><label class="form-field">AI DIFFICULTY<select id="difficulty"><option value="easy">Contender</option><option value="normal" selected>Professional</option><option value="hard">World Class</option></select></label><label class="form-field">PLAY STYLE<select id="play-style"><option value="coach">Coach · Make choices</option><option value="spectator">Spectator · Auto-play</option></select></label></div>
+          <div class="settings-foot"><span>Fictional outcomes · Region-verified participant lists</span><button id="start-match" class="btn primary">START SIMULATION ↗</button></div>
+        </div><div class="panel how"><div class="panel-heading"><h3>HOW IT WORKS</h3><span class="tag">3 STEPS</span></div><div class="how-row"><b>01</b><div><strong>PICK THE RIVALRY</strong><p>Pick your title, two teams, and a best-of series. Custom names work too.</p></div></div><div class="how-row"><b>02</b><div><strong>CONTROL THE MOMENT</strong><p>Call the plays at turning points. Your strategy affects the odds, but wins aren't guaranteed.</p></div></div><div class="how-row"><b>03</b><div><strong>MAKE HISTORY</strong><p>Read broadcast-style commentary and save the result to your browser.</p></div></div><div class="green-note">✦ Every game has its own rules and tactical decisions.</div></div></div>
+        <section class="directory" id="team-directory"><div class="directory-heading"><div><div class="eyebrow">03 / 2026 OWCS STAGE 3</div><h2>THE WORLD'S <em>CONTENDERS.</em></h2><p>Explore 37 confirmed Stage 3 participants from five competitive regions. Pick any two teams for a fantasy match.</p></div><div class="dir-meta"><span class="dir-count" id="directory-count">37</span><span>VERIFIED TEAMS<br>AS OF 25 OCT 2026</span></div></div><div class="directory-controls"><div class="region-tabs" id="region-tabs"></div><label class="directory-search">⌕ <input id="team-search" type="search" placeholder="Search teams or players..." aria-label="Search OWCS Stage 3 teams and players" /></label></div><div class="directory-grid" id="directory-grid"></div><div class="directory-footer"><span>Participant data is sourced from Stage 3 tournament pages. Player lists are not guaranteed match starters.</span><a id="directory-source" href="https://owtics.gg/en-US/esports/tournament" target="_blank" rel="noopener noreferrer">VERIFY PARTICIPANTS ↗</a></div></section>
+        <p class="disclaimer">RIVALRY is an independent, unofficial fantasy simulator. Team names refer to fictional matchups, not live games or current rosters. Not affiliated with game publishers, esports teams, or leagues.</p>
+      </section>
+      <section id="arena" class="page">
+        <div class="arena-top"><div><div class="eyebrow">LIVE FANTASY SIMULATION</div><h2 id="arena-title">WORLD GRAND FINAL</h2></div><button id="exit-arena" class="btn outline">← NEW MATCH</button></div>
+        <div class="arena-hero-strip" id="arena-hero-strip"><div><span>MAP INTELLIGENCE</span><strong id="arena-map-banner">KING’S ROW</strong><small id="arena-map-type">HYBRID · OVERWATCH 2</small></div><div class="arena-icon">◎</div></div><div class="scoreboard"><div class="score-grid"><div class="team-score"><div id="crest-a" class="crest">TM</div><div><div id="name-a" class="team-name">TWISTED MINDS</div><div class="team-tag">YOUR TEAM</div></div></div><div class="score-center"><div id="series-score" class="series-score">0 <span>:</span> 0</div><div id="series-type" class="series-type">BEST OF 7</div><div id="series-indicators" class="series-indicators"></div></div><div class="team-score opponent"><div id="crest-b" class="crest">ZD</div><div><div id="name-b" class="team-name">ZETA DIVISION</div><div class="team-tag">OPPONENT</div></div></div></div><div class="score-divider"></div><div class="meta-row"><strong id="map-name">MAP 1 · KING'S ROW</strong><span id="clock">4:00 REMAINING</span><span class="in-progress" id="match-status">● IN PROGRESS</span></div><div class="progress-track"><div id="progress-fill"></div></div></div>
+        <section class="ow-lineups hidden" id="ow-lineups"><div class="lineups-head"><div><div class="eyebrow">TEAM COMPOSITIONS</div><h3>THE STARTING FIVE <span>// FICTIONAL HERO PICKS</span></h3></div><div class="comp-picker"><label for="comp-style">YOUR STRATEGY</label><select id="comp-style"><option value="0">POKE</option><option value="1">DIVE</option><option value="2">RUSH</option><option value="3">BRAWL</option></select></div></div><div class="lineup-columns"><div class="lineup-col"><div class="lineup-title"><strong id="ow-lineup-a">TWISTED MINDS</strong><span>YOUR LINEUP</span></div><div id="ow-heroes-a" class="heroes-list"></div></div><div class="lineup-col"><div class="lineup-title"><strong id="ow-lineup-b">ZETA DIVISION</strong><span>OPPOSITION</span></div><div id="ow-heroes-b" class="heroes-list"></div></div></div><p class="lineup-note">The hero assignments are fictional simulation choices, not confirmed esports compositions. Roster names come from Stage 3 participant listings.</p></section>
+        <div class="play-layout"><div class="panel broadcast"><div class="panel-heading"><h3>MATCH BROADCAST</h3><span id="air-label" class="onair">● ON AIR</span></div><div id="feed" class="feed" role="log" aria-live="polite"></div><div class="feed-footer"><span>● LIVE PLAY-BY-PLAY</span><span id="event-count">0 EVENTS</span></div></div>
+          <div class="right-panel"><div class="panel command"><div class="panel-heading"><h3 id="choice-heading">TACTICAL DECISION</h3><span class="in-progress" id="choice-status">YOUR CALL</span></div><div class="command-inner"><div id="phase-message"></div><p id="decision-prompt">Make your next call.</p><div id="choice-buttons"></div><div class="command-footer"><button id="auto-play" class="btn subtle">▶ AUTO PLAY</button><button id="next-map" class="btn outline hidden">NEXT MAP →</button></div></div></div><div class="panel intel"><div class="panel-heading"><h3>MATCH INTEL</h3><span class="small-muted" id="intel-game">LIVE</span></div><div id="intel-body" class="intel-body"></div></div></div>
+        </div>
+      </section>
+      <section id="history" class="page"><div class="history-top"><div><div class="eyebrow">THE ARCHIVES</div><h2>MATCH HISTORY</h2><p>Every fictional rivalry you've finished, saved locally in this browser.</p></div><button id="history-new" class="btn primary">+ NEW SIMULATION</button></div><div id="history-list" class="history-list"></div></section>
+    </main>
+  </div>
+</div>
+<div id="toast" class="toast" role="status"></div>
+<script src="./teams.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>
