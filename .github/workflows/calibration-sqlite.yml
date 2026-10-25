@@ -1,0 +1,29 @@
+name: Fetch public calibration database
+on:
+  push:
+    paths: ['.github/workflows/calibration-sqlite.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download publisher-linked alternative
+        shell: python
+        run: |
+          import urllib.request,pathlib,json,hashlib
+          p=pathlib.Path('calibration');p.mkdir()
+          u='https://owdb.io/faceit.sqlite3.gz'
+          try:
+            with urllib.request.urlopen(urllib.request.Request(u,headers={'User-Agent':'RivalryCalibrationAudit/1.0'}),timeout=25) as r:
+              b=r.read(25000000)
+            (p/'faceit.sqlite3.gz').write_bytes(b)
+            result={'source':u,'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()}
+          except Exception as e: result={'source':u,'error':str(e)}
+          (p/'source.json').write_text(json.dumps(result,indent=2));print(result)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: calibration-public-sqlite
+          path: calibration
+          retention-days: 7
