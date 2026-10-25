@@ -1,0 +1,88 @@
+{
+  "tests": "Passed accounting, no overheal/overkill, LOS/range, friendly fire, objective/OT, substitutions, hero swaps, automatic BO3/5/7, classic6v6, pause and seed invariance at all speeds.",
+  "comparisonHash": "7eada5cc917c6590bdb3cd1f9a13f0d360b6685b8c60214f1a3a0edd6a5d926e",
+  "speeds": [
+    {
+      "speed": 0.5,
+      "ticks": 5232,
+      "score": [
+        0,
+        2
+      ],
+      "hash": "7eada5cc917c6590bdb3cd1f9a13f0d360b6685b8c60214f1a3a0edd6a5d926e"
+    },
+    {
+      "speed": 1,
+      "ticks": 5232,
+      "score": [
+        0,
+        2
+      ],
+      "hash": "7eada5cc917c6590bdb3cd1f9a13f0d360b6685b8c60214f1a3a0edd6a5d926e"
+    },
+    {
+      "speed": 2,
+      "ticks": 5232,
+      "score": [
+        0,
+        2
+      ],
+      "hash": "7eada5cc917c6590bdb3cd1f9a13f0d360b6685b8c60214f1a3a0edd6a5d926e"
+    },
+    {
+      "speed": 4,
+      "ticks": 5232,
+      "score": [
+        0,
+        2
+      ],
+      "hash": "7eada5cc917c6590bdb3cd1f9a13f0d360b6685b8c60214f1a3a0edd6a5d926e"
+    },
+    {
+      "speed": 8,
+      "ticks": 5232,
+      "score": [
+        0,
+        2
+      ],
+      "hash": "7eada5cc917c6590bdb3cd1f9a13f0d360b6685b8c60214f1a3a0edd6a5d926e"
+    }
+  ],
+  "series": [
+    {
+      "best": 3,
+      "score": [
+        0,
+        2
+      ],
+      "seconds": 1199.2000000001356,
+      "maps": 2
+    },
+    {
+      "best": 5,
+      "score": [
+        3,
+        0
+      ],
+      "seconds": 2203.600000000187,
+      "maps": 3
+    },
+    {
+      "best": 7,
+      "score": [
+        0,
+        4
+      ],
+      "seconds": 2337.2000000000653,
+      "maps": 4
+    }
+  ],
+  "classic": {
+    "score": [
+      0,
+      2
+    ],
+    "maps": 2,
+    "seconds": 572.1999999999931
+  }
+}

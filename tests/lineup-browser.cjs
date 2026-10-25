@@ -8,7 +8,7 @@ const {JSDOM}=require('jsdom');
  // Track scheduled rendering so jsdom is not asked to paint a destroyed document.
  const pendingFrames=new Set(),raf=w.requestAnimationFrame.bind(w),caf=w.cancelAnimationFrame.bind(w);
  w.requestAnimationFrame=callback=>{const id=raf(time=>{pendingFrames.delete(id);callback(time)});pendingFrames.add(id);return id;};
- w.scrollTo=()=>{};w.HTMLElement.prototype.scrollIntoView=function(){};w.fetch=async()=>({ok:true,json:async()=>[]});w.alert=()=>{};
+ w.HTMLCanvasElement.prototype.getContext=()=>null;w.scrollTo=()=>{};w.HTMLElement.prototype.scrollIntoView=function(){};w.fetch=async()=>({ok:true,json:async()=>[]});w.alert=()=>{};
  w.addEventListener('error',e=>{errors.push(e.message);e.preventDefault()});
  const scripts=[...html.matchAll(/<script src="\.\/([^"?]+)(?:\?[^" ]*)?"><\/script>/g)].map(m=>m[1]);
  for(const path of scripts)w.eval(fs.readFileSync(path,'utf8'));

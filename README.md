@@ -1,87 +1,107 @@
-# Rivalry — Overwatch History & Esports Match Simulator
+# Rivalry — Esports Match Simulator
 
-An independent, **fictional** esports simulator featuring Overwatch, VALORANT, League of Legends and Rocket League, with an interactive Overwatch archive covering historical OWL franchises (2018–2023), curated OWCS 2024–2025 teams, and the OWCS 2026 Stage 3 regional snapshot.
+[Open Rivalry](https://meowthebest.github.io/Rivalry/)
 
-## Website / publishing
-GitHub Pages: **https://meowthebest.github.io/Rivalry/** (available only after Pages is enabled).
+Rivalry is an unofficial, fictional esports simulator. The existing Overwatch team and
+season archive, player-role lineups, hero selection, source-attributed logos, tournament
+builder, replay timeline, and VALORANT / League of Legends / Rocket League modes are
+retained in one application.
 
-**Required one-time GitHub repository setting:** open **Settings → Pages → Build and deployment → Source → GitHub Actions**. A Pages workflow already exists at `.github/workflows/pages.yml`, but GitHub cannot run it successfully before the repository owner enables Pages. After updating the setting, go to **Actions → Publish Rivalry to GitHub Pages → Re-run all jobs**, or push another commit to `main`.
+## Watch an Overwatch series
 
-## How to play
-1. Choose Overwatch 2, VALORANT, League of Legends or Rocket League.
-2. Pick teams and a match format. The Overwatch directory supports all 22 original/rebranded OWL team identities plus historical OWCS participants.
-3. Choose **Auto** / **Classic 6v6** / **Modern 5v5** and a starting map for Overwatch.
-4. Simulate coach-directed tactical calls or use spectator auto-play.
-5. Explore the 2018–2026 timeline, world champions, classic rivalries and the clickable hero dossier panels.
+1. Select teams, exact seasons, ruleset, maps and a BO3 / BO5 / BO7 format.
+2. Start the matchup and press **Watch Live**. Rounds and maps progress automatically.
+3. Use Pause / Resume / Restart, 0.5× / 1× / 2× / 4× / 8×, or Instant Series.
+4. Expand the tactical observer. Pan, zoom, select/follow a player, follow the fight,
+   and toggle names or ability overlays. The persistent minimap reflects the same world.
 
-## Repository files
-- `index.html`: site
-- `style.css` / `archive.css`: responsive interface and timeline styling
-- `teams.js`: dated 2026 Stage 3 participant snapshot, maps, modern hero compositions
-- `archive.js`: historical OWL & OWCS team profiles, citations and classic 6v6 compositions
-- `app.js`: fictional round-by-round engine, maps, tactics and local match history
-- `archive-ui.js`: season selection, championship timeline, rivalry builder and hero dossiers
-- `assets/arena.svg`: original esports-themed illustration, **not** a copied game asset
-- `favicon.svg`: original Rivalry icon
-- `.github/workflows/pages.yml`: GitHub Pages deployment workflow
+At 1×, simulation time advances approximately one second per wall-clock second.
+Downtime is not automatically skipped. Changing speed never changes the engine seed or
+combat rules. Hidden tabs pause. Old saved matches must be explicitly restarted to use
+the new world engine; their recorded result history is not rewritten.
 
-## Historical sources and asset policy
-- [Liquipedia Overwatch](https://liquipedia.net/overwatch/Main_Page) — OWL, OWCS, events and participant history
-- [Overwatch Wiki](https://overwatch.fandom.com/wiki/Overwatch_Wiki) — hero and game references
-- [Overwatch League history](https://liquipedia.net/overwatch/Overwatch_League)
-- [OWCS 2024 World Finals](https://liquipedia.net/overwatch/Overwatch_Champions_Series/2024/World_Finals)
-- [OWCS 2025 World Finals](https://liquipedia.net/overwatch/Overwatch_Champions_Series/2025/World_Finals)
-- [Overwatch Esports — official](https://esports.overwatch.com/en-us)
-- [Blizzard official press center](https://blizzard.gamespress.com/Overwatch)
+## Statistics and simulation
 
-**Copyright:** Blizzard and professional esports team trademarks/artwork remain the property of their owners. We do not bulk copy or mirror Wikis/Liquipedia images or proprietary Blizzard assets. Research sources are cited and linked instead; the website uses an original vector arena artwork. Overwatch Wiki content has CC BY-NC-SA restrictions where its contributors can license it; proprietary third-party game assets may have separate rights.
+The fixed-step engine drives player movement, line of sight, ranges, finite barriers,
+healing, attacks, cooldowns, ultimate use, respawns and objectives. Every displayed
+statistic comes from those same interactions. The observer is not an independent dot
+animation.
 
-## Disclaimer
-Unofficial, noncommercial fan project. Not affiliated with Blizzard, Liquipedia, Fandom, OWL, OWCS, publishers or esports organizations. Match results, probabilities, rosters displayed in simulated compositions, and tactics are **fictional**, and not live matches or predictions. Archive lists are curated, not a complete census of every open qualifier entrant; player listings are not guaranteed starters. Browser data is saved locally; no backend or API key is required.
+The scoreboard separates **Eliminations / Final Blows / Assists / Deaths**, effective
+hero damage, healing and mitigation. Detailed ledgers also preserve barrier damage,
+ultimate counts, playing/alive time, objective time and hero-stint contributions.
+Completed-map, current-map and series views reconcile without double-counting. Per-10
+rates use total contribution divided by the player's own total active-round playing
+time. Substitutions preserve outgoing players' contributions.
 
+**The model is not the official game engine.** Geometry is a labeled original schematic,
+not a surveyed reconstruction of Overwatch maps. Kits, movement, timing and some match
+rules are simplified. A full-clear payload tie currently uses a documented faster-clear
+model tiebreak, not the official time-bank extension.
 
-## Overwatch Broadcast Studio (2026-10-25 build)
+## Evidence and limitations
 
-Start an **Overwatch** match from the match creator. The live 5v5/6v6 spectator studio launches automatically, while the original VALORANT, League of Legends and Rocket League modes remain available.
+[OBSERVER_MODEL.md](OBSERVER_MODEL.md) documents the cause of the previous low totals,
+all metric definitions, public sources, exact sample filters, missing fields and tests.
 
-Features include:
+The reference is the publisher-linked [OWDB FACEIT-derived dataset](https://owdb.io/data),
+retrieved 25 October 2026. The primary cohort contains **1,600 complete Master-division
+maps / 16,000 player-map records / 461 series**, not exclusively OWCS professional games.
+The source lacks final blows, per-map duration, detailed coordinates, ultimate counts
+and exact patch IDs. No verified reference per-10 rates are invented.
 
-- Event-driven teamfights with seeded game logic: health, ability cooldowns, eliminations, assists, headshots, rare environmental and self-eliminations, respawns, objective pressure, ultimate charge and team wipes.
-- Dynamic kill feed connected to the exact combat events and synchronized live kills/deaths/assists/damage/healing/mitigation stats.
-- Portraits pulled at runtime from the [OverFast API](https://overfast-api.tekrop.fr/) with fallbacks. Artwork is hosted by Blizzard; no copyrighted Blizzard binaries are committed to this repository.
-- Player role-specific hero swaps, season-specific verified substitutions, control inputs, step mode, 1×/2×/4× playback, next fight and instant series simulation.
-- Custom eight-team BO3/BO5/BO7 brackets, with results generated by the engine instead of manually picked winners.
-- Locally saved timelines and scrubbable simulation replays, searchable profiles, region/era filters.
-- Source-referenced snapshots for notable 2018–2023 OWL teams and OWCS teams through October 2026, including 2026 Pacific Stage 3 names.
+Calibration is partial. The published 40-map, 400-player-map batch includes every tested
+seed; remaining mode/role differences are visible in
+[the comparison report](validation/calibration-report.json). Accounting correctness and
+seed invariance do not prove equivalence to professional performance.
 
-### Data-integrity commitments
+Historical roster coverage is also partial. The application never fills unknown roles
+with invented professional players. Missing coverage is disclosed before launch;
+explicit practice slots are not verified players. Player hero preferences are labeled
+suggestions unless a source-backed seasonal usage sample is supplied.
 
-The database contains a broad curated **team/era directory**, but **does not yet include every player and every roster transfer** from the full history of professional Overwatch. Players are shown as verified only where the dated roster snapshot has a source. Teams without suitable verified role records simulate labeled **OPEN ROLE SLOTS**, not invented professional player identities.
+## Main modules
 
-The `heroes` arrays in verified player snapshots are **scenario suggestions**, not a source-backed catalog of historical hero proficiency. Team emblems are original approximation crests rather than unlicensed copies of official logos. The simulation itself is simplified and fictional; it does not reproduce every OWCS ruleset or official game engine mechanic. Historical winners and standings are **never generated from fictional simulations**.
+- `engine/tactical-map.js`: traversable schematic geometry, ramps, pathfinding and LOS.
+- `engine/world-sim.js`: authoritative fixed-step gameplay and per-player ledgers.
+- `engine/playback-clock.js`: real-time accumulator and identical instant simulation.
+- `ui/tactical-observer.js` / `.css`: overhead camera, minimap, effects and player inspector.
+- `studio.js`: broadcast HUD, playback controls, statistics, tournament/history integration.
+- `engine/player-lineups.js`, `data/*`, `ui/lineup-controls.js`: existing exact-season
+  rosters, hero preferences, legal selections and both-team controls.
+- `ui/team-logos.js`: existing source-attributed logo references and honest fallbacks.
+- `calibration/*`: public aggregate benchmarks and reproducible extraction/comparison.
+- `validation/*`, `tests/*`: checked results and reproducible regression suites.
 
-### Additional code modules
+## Run locally and test
 
-- `data/verified-rosters.js`: audited historical/modern team lineups with roles and nationalities.
-- `data/stage3-rosters.js`: additional 2026 Stage 3 source-verified team snapshots, including transfer-sensitive rosters.
-- `data/pacific-2026.js`: 2026 Pacific participant names, with unknown rosters kept unknown.
-- `engine/overwatch-sim.js`: stateful deterministic event-based match simulation, maps, combat and skills.
-- `studio.js` / `studio.css`: broadcast layout, killfeed, visual player statistics, playback, tournaments and history.
-- `tests/smoke.cjs`: automated jsdom tests for browser integration and simulation behavior.
-- `.github/workflows/test.yml`: runs syntax and integration checks on each push.
+No build step is required. Serve the repository root, for example:
 
-**Illustrative gameplay statistics are not official esports player data.**
+```sh
+python -m http.server 8000
+node tests/world-invariants.cjs
+node tests/world-sample.cjs 8 validation/model-maps.json
+python calibration/compare-model.py validation/model-maps.json
+npm install --no-save --no-package-lock jsdom@26
+node tests/smoke.cjs
+node tests/lineup-engine.cjs
+node tests/lineup-browser.cjs
+```
 
-## Roster & Hero Database Update — October 25, 2026
+A real-browser test is provided in `tests/browser-local.py` (Playwright,
+BeautifulSoup and Chromium required). It tests exact project scripts/CSS in memory;
+third-party image hosts are intentionally unavailable and are not certified by that test.
+GitHub Actions run the accounting, seeded playback, calibration batch and existing UI
+regressions. GitHub Pages publishes `main` using the existing workflow.
 
-**Why OPEN slots appeared:** Earlier versions matched only a literal team name, did not carry the selected season through to the match engine, and often fell back to a 2026 roster query. The current build resolves **team + year** as a pair, offers separate year pickers for both opponents, previews all listed players (including benched players) and shows source links.
+## Attribution
 
-- `data/historical-lineups.js` adds verified 2020, 2024 and 2025 event rosters and season-aware name resolution.
-- `data/asia-stage3-rosters.js` and `data/extra-rosters-2026.js` add source-backed Asian/EMEA OWCS Stage 3 rosters.
-- `data/season-selector.js` previews role groups and prevents silent historical roster substitutions. Generic OWL entries default to the newest sourced season when one exists.
-- `data/heroes-2026.js` catalogs **all 54 Overwatch heroes available as of October 25, 2026**, with approximate release-year eligibility, hero roles and selected ability labels. Sombra is Damage in earlier eras and Support after the October 2026 rework.
-- `data/hero-gallery.js` offers a searchable hero gallery with a role filter and playable-season filter; hero swaps in the spectator studio are constrained to heroes released by that team's chosen season.
-- Historical roster coverage is **partial**: a roster that isn't verified for a chosen year still displays **OPEN ROLE SLOT** rather than inventing a pro. The fact that a team is in the directory does not mean all of its annual players have been verified.
+Competition and roster references include Liquipedia, official Overwatch esports and
+source-linked tournament records. Hero artwork is requested through OverFast with
+fallbacks; team logos use the existing credited public source URLs. Original schematic
+art is not Blizzard map art. Logos and game artwork remain their owners' property;
+source attribution is not a claim of a redistribution license.
 
-Heroes/roles: [official Blizzard hero catalog](https://overwatch.blizzard.com/en-us/heroes/).
-Season-specific teams: [Liquipedia](https://liquipedia.net/overwatch/Main_Page).
+Not affiliated with Blizzard, FACEIT, OWDB, Liquipedia, teams or tournament organizers.
+All simulated matches, coordinates and results are fictional. Browser-local saves
+remain on the user's device. No private match credentials or hidden telemetry are used.

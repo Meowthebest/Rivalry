@@ -1,0 +1,33 @@
+{
+  "browser": "Chromium 144.0.7559.96 (system executable)",
+  "transport": "Exact project HTML/CSS and script order loaded in memory; no external image availability asserted.",
+  "checks": [
+    "Existing match creator opens the integrated observer and preserves both sourced teams.",
+    {
+      "activeMatch1x": {
+        "wallSeconds": 5.216,
+        "simSeconds": 5.0
+      }
+    },
+    "Pause freezes the entire authoritative state.",
+    {
+      "8xSimSecondsAfter1_1WallSeconds": 9.2
+    },
+    "Overhead expand, select, inspector, follow, zoom, drag-pan and fit controls work with actual simulated positions.",
+    "Mobile viewport has no horizontal page overflow; minimap and compact all-player HUD remain visible.",
+    {
+      "automaticFullSeries": {
+        "score": [
+          0,
+          2
+        ],
+        "maps": 2,
+        "seconds": 1141.6000000001225,
+        "events": 904
+      },
+      "statisticsExport": "Completed maps, current contribution and all series player ledgers exported."
+    },
+    "Restart resets the match but preserves the seed and saved results."
+  ],
+  "pageErrors": []
+}

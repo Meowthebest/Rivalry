@@ -1,0 +1,36 @@
+name: World simulation and calibration checks
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  world:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax-check authoritative world, clock and observer
+        run: |
+          node --check engine/tactical-map.js
+          node --check engine/world-sim.js
+          node --check engine/playback-clock.js
+          node --check ui/tactical-observer.js
+          node --check studio.js
+      - name: Accounting, geometry, BO3/5/7, pause and seeded speed equivalence
+        run: node tests/world-invariants.cjs
+      - name: Reproduce all 40 calibration maps
+        run: node tests/world-sample.cjs 8 validation/model-maps.json
+      - name: Compare available mode-role totals and disclose residuals
+        run: python calibration/compare-model.py validation/model-maps.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: world-accounting-and-calibration
+          path: |
+            validation/engine-checks.json
+            validation/calibration-report.json
+            validation/model-maps.json
+          retention-days: 7

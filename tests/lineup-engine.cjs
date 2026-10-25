@@ -1,6 +1,6 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert/strict');
 const w={},ctx=vm.createContext({window:w,console});
-for(const p of ['teams.js','archive.js','data/pacific-2026.js','data/verified-rosters.js','data/stage3-rosters.js','data/asia-stage3-rosters.js','data/extra-rosters-2026.js','data/historical-lineups.js','engine/overwatch-sim.js','data/heroes-2026.js','engine/player-lineups.js','data/team-logo-manifest.js'])vm.runInContext(fs.readFileSync(p,'utf8'),ctx,{filename:p});
+for(const p of ['teams.js','archive.js','data/pacific-2026.js','data/verified-rosters.js','data/stage3-rosters.js','data/asia-stage3-rosters.js','data/extra-rosters-2026.js','data/historical-lineups.js','engine/overwatch-sim.js','data/heroes-2026.js','engine/player-lineups.js','data/team-logo-manifest.js','engine/tactical-map.js','engine/world-sim.js'])vm.runInContext(fs.readFileSync(p,'utf8'),ctx,{filename:p});
 const E=w.RIVALRY_ENGINE,L=w.RIVALRY_LINEUPS;
 for(const [a,b,ya,yb,rules] of [['Twisted Minds','ZETA Division',2026,2026,'modern'],['Crazy Raccoon · 2024','Team Falcons · 2025',2024,2025,'modern'],['San Francisco Shock · OWL','London Spitfire · 2018',2019,2018,'classic']]){
  const s=E.create({a,b,seasonA:ya,seasonB:yb,rules,seed:91,best:3});

@@ -78,7 +78,7 @@
  },true);
  function renderPanel(force=false){
   const s=window.RIVALRY_STUDIO?.state(),root=$('#rv-lineup-config');if(!s||!root)return;
-  const signature=s.seed+'|'+activeSide+'|'+s.teams.map(t=>t.name+t.season+t.players.map(p=>p.name+p.hero).join()).join('|');
+  const signature=s.seed+'|'+(s.phase||'legacy')+'|'+activeSide+'|'+s.teams.map(t=>t.name+t.season+t.players.map(p=>p.name+p.hero).join()).join('|');
   if(!force&&root.querySelector('.rvl-dual-lineups')?.dataset.signature===signature)return;
   const box=el('div','rvl-dual-lineups');box.dataset.signature=signature;
   const tabs=el('div','rvl-side-tabs');tabs.setAttribute('role','tablist');
@@ -99,13 +99,13 @@
    const eligible=(coverage.roster?.players||[]).filter(x=>x.role===p.role);
    if(!eligible.length)playerSelect.add(new Option('No verified player available',''));
    eligible.forEach(raw=>{const option=new Option(raw.name,raw.name);option.disabled=team.players.some((x,j)=>i!==j&&x.name===raw.name);playerSelect.add(option)});
-   playerSelect.value=p.verified?p.name:'';playerSelect.disabled=!eligible.length;
+   playerSelect.value=p.verified?p.name:'';playerSelect.disabled=!eligible.length||s.phase==='active';playerSelect.title=s.phase==='active'?'Substitutions are available between rounds and maps.':'Choose a sourced same-role player';
    playerSelect.onchange=()=>{const raw=eligible.find(x=>x.name===playerSelect.value);if(!window.RIVALRY_ENGINE.substitute(s,activeSide,i,raw)){playerSelect.value=p.name;return;}persistAndPaint();};
    const heroSelect=el('select');heroSelect.setAttribute('aria-label',`Team ${activeSide+1} ${p.name} hero`);heroSelect.dataset.side=activeSide;heroSelect.dataset.heroSlot=i;
    const raw=coverage.roster?.players.find(x=>x.name===p.name)||p;
    const pref=L.preferences(raw,team.name,team.season);
    pref.ranked.forEach(hero=>{const tag=pref.measured.some(x=>x.hero===hero)?' · sampled usage':pref.suggested.includes(hero)?' · player pool':'';const option=new Option(hero+tag,hero);option.disabled=team.players.some((x,j)=>j!==i&&x.hero===hero);heroSelect.add(option)});
-   heroSelect.value=p.hero;heroSelect.onchange=()=>{if(!window.RIVALRY_ENGINE.heroSwap(s,activeSide,i,heroSelect.value)){heroSelect.value=p.hero;return;}persistAndPaint();};
+   heroSelect.title=s.phase==='active'?'Hero swaps are allowed at spawn or while respawning; no free midfight refill.':'Choose a hero';heroSelect.value=p.hero;heroSelect.onchange=()=>{if(!window.RIVALRY_ENGINE.heroSwap(s,activeSide,i,heroSelect.value)){heroSelect.value=p.hero;return;}persistAndPaint();};
    row.append(playerSelect,heroSelect);
    const basis=p.heroPreference;
    const summary=el('div','rvl-preference-note',basis?.label||'Suggested pool · usage unavailable');
@@ -115,8 +115,8 @@
    if(basis?.sources?.[0]){const a=el('a','','View usage ↗');a.href=basis.sources[0];a.target='_blank';a.rel='noopener noreferrer';summary.append(a);}
    row.append(summary);list.append(row);
   });box.append(list);
-  const auto=el('button','rv-tool accent',`Auto-pick Team ${activeSide+1}'s player preferences`);auto.type='button';auto.onclick=()=>{window.RIVALRY_ENGINE.autoHeroes(s,activeSide);persistAndPaint();};box.append(auto);
-  box.append(el('p','rvl-muted','Season playtime data is ranked when supplied. Otherwise the listed player pool is a suggestion, not a measured “most played” statistic. Role, release-year and duplicate-hero restrictions still apply.'));
+  const auto=el('button','rv-tool accent',`Auto-pick Team ${activeSide+1}'s player preferences`);auto.type='button';auto.disabled=s.phase==='active';auto.title='Automatic composition changes are available between rounds.';auto.onclick=()=>{window.RIVALRY_ENGINE.autoHeroes(s,activeSide);persistAndPaint();};box.append(auto);
+  box.append(el('p','rvl-muted','Substitutions and automatic compositions are available between rounds; hero swaps are spawn-only. Season playtime data is ranked when supplied. Otherwise the listed player pool is a suggestion, not a measured “most played” statistic. Role, release-year and duplicate-hero restrictions still apply.'));
   if(s.lineupRevision!==L.REVISION){
    const notice=el('div','rvl-roster-alert','This saved match predates the roster fix. Restart to rebuild BOTH teams without changing its past event log.');
    const restart=el('button','rv-tool','Restart with resolved lineups');restart.type='button';restart.onclick=()=>{

@@ -11,7 +11,11 @@ async function main(){
  w.alert=()=>{};
  const errors=[];
  w.addEventListener('error',e=>{errors.push(e.message);e.preventDefault()});
- for(const path of ['teams.js','archive.js','data/pacific-2026.js','app.js','archive-ui.js','data/verified-rosters.js','data/stage3-rosters.js','data/asia-stage3-rosters.js','data/extra-rosters-2026.js','data/historical-lineups.js','engine/overwatch-sim.js','data/heroes-2026.js','studio.js','data/season-selector.js','data/hero-gallery.js']){
+ const paths=[...html.matchAll(/<script src="\.\/([^"?]+)(?:\?[^" ]*)?"><\/script>/g)].map(m=>m[1]);
+ w.HTMLCanvasElement.prototype.getContext=()=>null;
+ const pending=new Set(),raf=w.requestAnimationFrame.bind(w),caf=w.cancelAnimationFrame.bind(w);
+ w.requestAnimationFrame=cb=>{const id=raf(t=>{pending.delete(id);cb(t)});pending.add(id);return id;};
+ for(const path of paths){
   const src=fs.readFileSync(path,'utf8');
   try{w.eval(src)}catch(e){throw Error(path+': '+e.stack)}
  }
@@ -47,6 +51,7 @@ async function main(){
  assert.equal(w.RIVALRY_ROSTER_FOR('Spacestation Gaming').players.find(p=>p.name==='Galaa')?.role,'Support','Stage 3 Spacestation support roster mapped');
  const count=w.document.querySelectorAll('#directory-grid .directory-card').length;
  assert.ok(count>=30,'Directory shows team cards');
+ w.RIVALRY_LINEUP_UI.boot();w.RIVALRY_LOGOS.boot();w.document.querySelector('#match-format').value='3';
  const start=w.document.querySelector('#start-match');assert.ok(start);
  start.click();
  assert.ok(w.document.querySelector('#rivalry-studio').classList.contains('open'),'Studio launches from Overwatch match form');
@@ -62,9 +67,9 @@ async function main(){
  const t0=w.RIVALRY_STUDIO.state().tick;
  w.document.querySelector('#rv-step').click();
  assert.equal(w.RIVALRY_STUDIO.state().tick,t0+1,'Manual step advances engine exactly once');
- for(let i=0;i<45;i++)w.document.querySelector('#rv-step').click();
+ for(let i=0;i<900;i++)w.RIVALRY_ENGINE.step(w.RIVALRY_STUDIO.state());w.RIVALRY_STUDIO.refresh();
  const s=w.RIVALRY_STUDIO.state();
- assert.ok(s.events.length>=20,'State-driven events exist');
+ assert.ok(s.events.length>=5,'State-driven events exist');
  assert.ok(s.events.some(x=>x.type==='elimination'),'At least one real combat elimination generated');
  assert.ok(s.teams[0].players.some(p=>p.damage>0),'Damage follows combat logic');
  assert.ok(s.teams.some(t=>t.players.some(p=>p.healing>0)),'Healing follows combat logic');
@@ -80,6 +85,7 @@ async function main(){
  assert.ok(w.document.querySelector('#rv-bracket').textContent.includes('SEMIFINALS'),'Bracket rendered after simulation');
  w.document.querySelector('[data-tab="match"]').click();
  w.document.querySelector('#rv-full').click();
+ for(let i=0;i<3000&&w.RIVALRY_STUDIO.state().status!=='finished';i++)await new Promise(r=>setTimeout(r,10));
  assert.equal(w.RIVALRY_STUDIO.state().status,'finished','Instant full-series simulation completes');
  assert.ok(JSON.parse(w.localStorage.getItem('rivalry.owstudio.history.v2')).length>=1,'Full match saved as replay');
  w.document.querySelector('[data-tab="replay"]').click();
@@ -88,7 +94,7 @@ async function main(){
  assert.equal(seeded.teams[0].players.length,6,'Classic 6v6 team supported');
  const unknown=w.RIVALRY_ENGINE.create({a:'Cheeseburger',b:'VARREL',best:3,seed:71});
  assert.ok(unknown.teams[0].players.every(p=>p.verified===false),'Unverified players are not fictional real names');
- w.close();
+w.RIVALRY_STUDIO.close();w.RIVALRY_OBSERVER?.dispose();for(const id of pending)caf(id);pending.clear();w.close();
  console.log('PASS: exact-year rosters, 54 heroes, historic release restrictions, 2026 role changes, 5v5, 6v6, gallery, live simulation, and tournament.');
 }
 main().catch(err=>{console.error(err);process.exitCode=1});

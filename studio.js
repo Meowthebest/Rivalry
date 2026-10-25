@@ -15,7 +15,7 @@ const fmt=n=>{const v=Math.max(0,Math.ceil(n));return Math.floor(v/60)+':'+Strin
 const short=n=>n.length>17?n.slice(0,15)+'…':n;
 const avatar=n=>String(n).split(/[\s·]+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();
 const themeFor=n=>window.RIVALRY_TEAM_STYLE?.[n]?.primary||(n.includes('Shock')?'#ee945c':n.includes('Mayhem')?'#f8abcb':'#9eb6d4');
-let game=load(KEY,null),auto=null,speed=1,tab='match',lastDisplayedEvent=0,paintTimer=null;
+let driver=null;let game=load(KEY,null),auto=null,speed=1,tab='match',lastDisplayedEvent=0,paintTimer=null;
 let history=load(HISTORY,[]),tournament=load(TOURNAMENT,null),profileIndex=0,heroImages={},abilityIcons={},detailRequests=new Set(),heroIconsLoaded=false,cmd='hold',replay=null;
 const wrap=node('div');wrap.id='rivalry-studio';
 wrap.innerHTML=`
@@ -44,10 +44,10 @@ wrap.innerHTML=`
 <div class="rv-center">
  <div class="rv-panel"><div class="rv-panelhead"><h3>TACTICAL CONTROL</h3><small>YOUR SHOTCALL</small></div>
  <div class="rv-controls" id="rv-commands"></div>
- <div class="rv-toolbar"><button class="rv-tool accent" id="rv-play">▶ START</button><button class="rv-tool" id="rv-step">NEXT EVENT ↗</button><button class="rv-tool" id="rv-nextfight">NEXT FIGHT »</button><button class="rv-tool" id="rv-full">SIMULATE SERIES ⇥</button><button class="rv-tool" id="rv-nextmap" style="display:none">NEXT MAP ↗</button><div class="rv-speed" id="rv-speed"><button class="rv-tool selected" data-speed="1">1×</button><button class="rv-tool" data-speed="2">2×</button><button class="rv-tool" data-speed="4">4×</button></div></div>
+ <div class="rv-toolbar"><button class="rv-tool accent" id="rv-play">▶ WATCH LIVE</button><button class="rv-tool" id="rv-step">STEP 0.2s</button><button class="rv-tool" id="rv-nextfight">SKIP 30s »</button><button class="rv-tool" id="rv-restart">RESTART ↻</button><button class="rv-tool" id="rv-full">SIMULATE SERIES ⇥</button><button class="rv-tool" id="rv-nextmap" style="display:none">NEXT MAP ↗</button><div class="rv-speed" id="rv-speed"><button class="rv-tool" data-speed="0.5">0.5×</button><button class="rv-tool selected" data-speed="1">1×</button><button class="rv-tool" data-speed="2">2×</button><button class="rv-tool" data-speed="4">4×</button><button class="rv-tool" data-speed="8">8×</button></div></div>
  <div class="rv-now" id="rv-statusline">Pause anytime to adjust hero compositions or make a tactical call.</div>
  </div>
- <div class="rv-panel"><div class="rv-panelhead"><h3>TEAM STATISTICS</h3><small>K / D / A / DMG / HEAL / MIT</small></div><div id="rv-stats"></div></div>
+ <div class="rv-panel"><div class="rv-panelhead"><h3>TEAM STATISTICS</h3><small>E · FB · A · D / EFFECTIVE TOTALS</small></div><div class="rv-stat-controls"><label>Scope <select id="rv-stat-scope"><option value="series">Series incl. current map</option><option value="current">Current map</option></select></label><label><input type="checkbox" id="rv-stat-rates"> Per 10 minutes</label><button class="rv-tool" id="rv-export-stats">EXPORT JSON</button></div><div id="rv-stats"></div></div>
 </div>
 <div class="rv-roster b" id="rv-roster-b"></div>
 </div>
@@ -81,32 +81,21 @@ function launch(a,b,options={}){
  let maps=ENGINE.maps.map(x=>x[0]);
  const first=options.map||mapFromPicker;
  if(maps.includes(first))maps=[first,...maps.filter(x=>x!==first)];
- game=ENGINE.create({a,b,seasonA:yearA,seasonB:yearB,rules,best,maps,seed:options.seed});
- cmd='hold';lastDisplayedEvent=0;openStudio('match');persist();
+ game=ENGINE.create({...options,a,b,seasonA:yearA,seasonB:yearB,rules,best,maps:options.maps||maps,seed:options.seed});
+ if(driver)driver.reset();cmd='auto';lastDisplayedEvent=0;openStudio('match');renderCommands();persist();
  loadPortraits();renderProfiles();
 }
 function persist(){if(!game)return;save(KEY,game)}
-function pause(){if(auto){clearInterval(auto);auto=null}const btn=$('#rv-play');if(btn)btn.textContent='▶ RESUME'}
-function play(){if(!game)return;if(game.status==='finished')return;if(game.status==='between'){ENGINE.nextMap(game);persist();}
- if(auto){pause();return}
- auto=setInterval(()=>{if(!game||game.status!=='playing'){pause();paint();return}
-  advance(cmd);},Math.round(980/speed));$('#rv-play').textContent='Ⅱ PAUSE';
-}
-function advance(strategy,steps=1){
- if(!game||game.status==='finished')return;if(game.status==='between'){pause();paint();return}
- for(let i=0;i<steps&&game.status==='playing';i++)ENGINE.step(game,strategy);
- if(game.status==='finished'){pause();commitHistory()}persist();paint();
-}
-function fullSim(){
- if(!game)return;pause();let count=0;
- while(game.status!=='finished'&&count<3400){if(game.status==='between')ENGINE.nextMap(game);else ENGINE.step(game,cmd);count++;}
- if(game.status==='finished')commitHistory();persist();paint();
-}
+function getDriver(){if(!driver)driver=window.RIVALRY_PLAYBACK.create({state:()=>game,step:s=>ENGINE.step(s),onFrame:()=>{paint();if(game&&game.tick%50===0)persist();},onFinish:()=>{commitHistory();persist();paint();}});return driver;}
+function pause(){auto=null;if(driver&&(driver.isRunning()||driver.isFast())){driver.pause();persist();}const btn=$('#rv-play');if(btn)btn.textContent='▶ WATCH LIVE';}
+function play(){if(!game||game.worldVersion!==ENGINE.VERSION)return;if(getDriver().isRunning()){pause();return}auto=true;getDriver().play();paint();}
+function advance(strategy,steps=1){if(!game||game.worldVersion!==ENGINE.VERSION||game.status==='finished')return;pause();if(strategy)game.commands[0]=strategy;for(let i=0;i<steps&&game.status!=='finished';i++)ENGINE.step(game);if(game.status==='finished')commitHistory();persist();paint();}
+function fullSim(){if(!game||game.worldVersion!==ENGINE.VERSION)return;pause();$('#rv-full').disabled=true;getDriver().fastForward().then(()=>{commitHistory();persist();paint();}).catch(error=>{write($('#rv-statusline'),error.message);paint();});}
 function commitHistory(){
- if(!game||game.saved)return;game.saved=true;
+ if(!game||game.saved||game.status!=='finished')return;game.saved=true;
  history.unshift({id:Date.now(),title:game.teams[0].name+' vs '+game.teams[1].name,teams:game.teams.map(t=>t.name),
   date:new Date().toISOString(),score:[...game.score],mode:game.rules,best:game.best,mapResults:game.mapResults,
-  events:game.events.slice(-1400),seed:game.seed});
+  events:game.events.filter(e=>e.important).slice(-1400),seed:game.seed,records:game.records,options:game.options,engineVersion:game.worldVersion});
  history=history.slice(0,15);save(HISTORY,history);
 }
 function initials(name){return avatar(name)}
@@ -124,7 +113,7 @@ function ensureAbilityIcons(hero){
 }
 function portrait(hero){
  const url=heroImages[hero]||heroImages[heroSlug(hero)];if(url){const i=node('img');i.src=url;i.alt=hero;i.loading='lazy';i.onerror=()=>{delete heroImages[hero];i.remove()};return i}
- return node('span','',hero.replace(/[^A-Za-z]/g,'').slice(0,2).toUpperCase()||'OW');
+ return node('span','',String(hero||'OW').replace(/[^A-Za-z]/g,'').slice(0,2).toUpperCase()||'OW');
 }
 function portraitNode(hero){
  const d=node('div','rv-portrait');d.append(portrait(hero));d.title=hero;return d
@@ -176,9 +165,9 @@ function eventText(e){
 }
 function commentary(){
  const events=game.events;const last=events[events.length-1];if(!last)return'Both teams are preparing the opening engagement.';
- const biggest=[...events].reverse().find(e=>e.important||['teamwipe','elimination','ultimate','overtime'].includes(e.type))||last;
+ const biggest=[...events].reverse().find(e=>e.important&&game.time-e.t<10)||last;
  const t=eventText(biggest);
- if(biggest.type==='elimination')return 'WHAT A PICK! '+t.toUpperCase();
+ if(biggest.type==='elimination')return t;
  if(biggest.type==='teamwipe')return 'AN ABSOLUTE TEAM WIPE! '+t.toUpperCase();
  if(biggest.type==='ultimate')return 'HERE COMES THE ULTIMATE! '+t.toUpperCase();
  if(biggest.type==='overtime')return 'OVERTIME! NOBODY IS GIVING THIS UP!';
@@ -186,7 +175,7 @@ function commentary(){
 }
 function timeline(){
  const root=$('#rv-timeline');root.replaceChildren();
- for(const e of game.events.slice(-45).reverse()){
+ for(const e of game.events.filter(e=>e.important).slice(-45).reverse()){
   const item=node('div','rv-event'+(e.important?' important':'')),t=node('span','',fmt(e.clock));
   const info=node('div');info.append(node('b','',e.type.toUpperCase().replaceAll('_',' ')),node('div','',eventText(e)));
   item.append(t,info);root.append(item);
@@ -206,16 +195,15 @@ function cards(side){
  }
 }
 function stats(){
- const root=$('#rv-stats'),table=node('table','rv-stattable'),thead=node('thead'),tr=node('tr');
- for(const heading of ['PLAYER','K','D','A','DMG','HEAL','MIT'])tr.append(node('th','',heading));
- thead.append(tr);table.append(thead);
- const tbody=node('tbody');
- game.teams.forEach((t,side)=>t.players.forEach(p=>{
-   const row=node('tr',side===0?'a':'b');
-   for(const cell of [p.verified?p.name:'OPEN SLOT',p.kills,p.deaths,p.assists,Math.round(p.damage).toLocaleString(),Math.round(p.healing).toLocaleString(),Math.round(p.mitigated).toLocaleString()])
-      row.append(node('td','',String(cell)));
-   tbody.append(row);
- }));table.append(tbody);root.replaceChildren(table);
+ if(!game?.worldVersion){$('#rv-stats').textContent='Restart this legacy save to use reconciled statistics.';return;}
+ const scope=$('#rv-stat-scope'),selected=scope.value,rates=$('#rv-stat-rates').checked;
+ const expected=2+game.records.length;if(scope.options.length!==expected){scope.replaceChildren(new Option('Series incl. current map','series'),new Option('Current map','current'));game.records.forEach((m,i)=>scope.add(new Option('Map '+(i+1)+' · '+m.name,String(i))));scope.value=selected;}
+ const rows=ENGINE.statistics(game,scope.value||'series',rates),table=node('table','rv-stattable'),head=node('tr');
+ const fields=[['PLAYER',null],['E','eliminations'],['FB','finalBlows'],['A','assists'],['D','deaths'],['DMG','damage'],['HEAL','healing'],['MIT','mitigated'],['ULT U/E','ultimatesUsed'],['TIME','timePlayed']];
+ fields.forEach(([label])=>head.append(node('th','',label)));const th=node('thead');th.append(head);table.append(th);const body=node('tbody');
+ rows.sort((a,b)=>a.side-b.side).forEach(r=>{const tr=node('tr',r.side===0?'a':'b');fields.forEach(([label,k])=>{let value=!k?r.name:k==='timePlayed'?fmt(r.seconds):k==='ultimatesUsed'?(rates?r.stats.ultimatesUsed.toFixed(1):r.stats.ultimatesUsed)+'/'+(rates?r.stats.ultimatesEarned.toFixed(1):r.stats.ultimatesEarned):rates?r.stats[k].toLocaleString(undefined,{maximumFractionDigits:1}):Math.round(r.stats[k]).toLocaleString();tr.append(node('td','',value));});body.append(tr);});
+ table.append(body);const note=node('p','rv-stats-note',rates?'Per 10 min = aggregate × 600 / this player’s total active-round playing seconds (including respawn time).':'E: shared damage-credit eliminations · FB: final blows · A: support/utility assists · DMG: effective hero damage; barriers shown in detailed export.');
+ const scroll=node('div','rv-stats-overflow');scroll.append(table);$('#rv-stats').replaceChildren(scroll,note);
 }
 function picker(){
  const root=$('#rv-lineup-config');root.replaceChildren();if(!game)return;
@@ -250,7 +238,7 @@ function picker(){
  }else root.append(node('div','rv-roster-warning','No season-specific verified squad available. The match uses explicitly labeled simulation slots.'));
 }
 function paint(){
- if(!game)return;studioColors();
+ if(!game)return;studioColors();if(game.worldVersion!==ENGINE.VERSION){write($('#rv-statusline'),'Legacy match: restart to use the new world engine. Saved history is retained.');}
  write($('#rv-name-a'),game.teams[0].name);write($('#rv-name-b'),game.teams[1].name);
  write($('#rv-logo-a'),avatar(game.teams[0].name));write($('#rv-logo-b'),avatar(game.teams[1].name));
  write($('#rv-tag-a'),game.teams[0].season+' · '+game.rules.toUpperCase()+' ERA');
@@ -259,30 +247,30 @@ function paint(){
  write($('#rv-serieslabel'),'BEST OF '+game.best+' · '+(game.rules==='classic'?'6V6':'5V5'));
  write($('#rv-map'),game.map.toUpperCase());write($('#rv-mapline'),'MAP '+(game.mapIndex+1)+' · '+game.map.toUpperCase());
  write($('#rv-mode'),game.mode.toUpperCase()+' · '+(game.mapIndex+1)+' / '+game.best);
- write($('#rv-period'),game.mode.toUpperCase()+' • '+(game.contest?'CONTESTED':'OBJECTIVE ACTIVE'));
- write($('#rv-clock'),fmt(game.clock));
+ write($('#rv-period'),'ROUND '+((game.round||0)+1)+' · '+(game.phase||'')+' · '+(game.contest?'CONTESTED':game.mode));
+ write($('#rv-clock'),game.phase==='setup'||game.phase==='roundbreak'||game.phase==='mapbreak'?fmt(game.phaseLeft):game.mode==='Flashpoint'?fmt(game.elapsed):game.mode==='Control'?fmt(game.roundElapsed):fmt(game.clock));
  write($('#rv-live'),game.status==='finished'?'SERIES FINAL':game.status==='between'?'MAP COMPLETE':game.overtime?'● OVERTIME':'● LIVE SIMULATION');
  $('#rv-live').classList.toggle('rv-ot',game.overtime);
  $('#rv-progress-a').style.width=game.progress[0]+'%';$('#rv-progress-b').style.width=game.progress[1]+'%';
  write($('#rv-progresslabel'),Math.round(game.progress[0])+'% — '+Math.round(game.progress[1])+'%');
  write($('#rv-objective'),(game.contest?'CONTESTED · ':'')+game.teams[0].players.filter(p=>p.alive).length+' vs '+game.teams[1].players.filter(p=>p.alive).length+' ALIVE');
  write($('#rv-castertext'),commentary());
- cards(0);cards(1);killFeed();timeline();stats();
- write($('#rv-statusline'),game.status==='finished'?'Series complete · '+game.teams[game.lastWinner].name+' win. Open Replays for highlights.':
- game.status==='between'?'Map complete. Advance to the next map to continue.':
- 'TACTIC: '+cmd.toUpperCase()+' · '+(game.rules==='classic'?'CLASSIC 6v6':'MODERN 5v5')+' · '+game.tick+' simulated combat beats');
+ cards(0);cards(1);killFeed();timeline();stats();window.RIVALRY_LINEUP_UI?.renderPanel();
+ write($('#rv-statusline'),game.status==='finished'?'Series complete · '+(game.teams[game.lastWinner]?.name||'draw')+'. Open Replays for highlights.':
+ game.status==='between'?'Map complete. Watch Live automatically advances after the intermission.':
+ '1× = real time · '+(game.rules==='classic'?'6v6':'5v5')+' · '+(game.phase||'')+' · '+fmt(game.seriesSeconds||0)+' active series time');
  $('#rv-nextmap').style.display=game.status==='between'?'inline-block':'none';
- $('#rv-play').disabled=game.status==='finished';
- $('#rv-full').disabled=game.status==='finished';
+ $('#rv-play').disabled=game.status==='finished'||game.worldVersion!==ENGINE.VERSION;$('#rv-play').textContent=driver?.isRunning()?'Ⅱ PAUSE':game.status==='finished'?'SERIES COMPLETE':'▶ WATCH LIVE';
+ $('#rv-full').disabled=game.status==='finished'||!!driver?.isFast()||game.worldVersion!==ENGINE.VERSION;
  $('#rv-step').disabled=game.status!=='playing';
- $('#rv-nextfight').disabled=game.status!=='playing';
+ $('#rv-nextfight').disabled=game.status!=='playing';if(game.worldVersion!==ENGINE.VERSION)write($('#rv-statusline'),'This saved match uses the previous engine. Restart the matchup to enable Watch Live and reconciled statistics; saved history remains unchanged.');
 }
 function renderCommands(){
  const root=$('#rv-commands');root.replaceChildren();
- for(const [key,title] of [['poke','ANGLE & POKE'],['dive','COORDINATED DIVE'],['rush','RUSH OBJECTIVE'],['hold','HOLD SPACE'],['combo','ULTIMATE COMBO']]){
+ for(const [key,title] of [['auto','AUTO COACH'],['poke','ANGLE & POKE'],['dive','COORDINATED DIVE'],['rush','RUSH OBJECTIVE'],['hold','HOLD SPACE'],['combo','ULTIMATE COMBO']]){
   const b=node('button','rv-command'+(cmd===key?' active':''),title);
   b.title=key==='combo'?'Coordinate ready ultimates':'Control focus-fire and defensive positioning';
-  b.onclick=()=>{cmd=key;renderCommands();advance(key);picker()};
+  b.onclick=()=>{cmd=key;if(game?.commands)game.commands[0]=key==='auto'?null:key;renderCommands();paint();};
   root.append(b);
  }
 }
@@ -321,11 +309,10 @@ function renderProfiles(){
 function simulateQuick(a,b,best,seed){
  const sim=ENGINE.create({a,b,best,rules:/(?: · (?:OWL|2018|2019|2020|2021))/.test(a+' '+b)?'classic':'modern',
   seed:seed});
- let steps=0;while(sim.status!=='finished'&&steps<2400){
-  if(sim.status==='between')ENGINE.nextMap(sim);
-  else ENGINE.step(sim,steps%4===0?'combo':steps%3===0?'poke':'rush');steps++;
+ let steps=0;while(sim.status!=='finished'&&steps<250000){
+  ENGINE.step(sim);steps++;
  }
- return{winner:sim.score[0]>sim.score[1]?a:b,score:[...sim.score],steps,events:sim.events.slice(-80)};
+ return{winner:sim.score[0]>sim.score[1]?a:sim.score[1]>sim.score[0]?b:null,score:[...sim.score],steps,events:sim.events.slice(-80)};
 }
 function renderTournament(){
  const root=$('#rv-tteamselects');if(!root.childElementCount){
@@ -387,12 +374,16 @@ function drawReplay(index){
 function hook(){
  wrap.querySelectorAll('[data-tab]').forEach(n=>n.addEventListener('click',()=>showTab(n.dataset.tab)));
  $('#rv-exit').onclick=closeStudio;
+ $('#rv-export-stats').onclick=()=>{if(!game?.worldVersion)return;const data={fictional:true,seed:game.seed,engineVersion:game.worldVersion,sourceManifest:'calibration/benchmarks.json',definitions:'OBSERVER_MODEL.md',series:ENGINE.statistics(game),currentMap:ENGINE.statistics(game,'current'),completedMaps:game.records,rateDenominator:'Own active-round playing seconds including deaths; not mean of map rates'};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='Rivalry-simulated-statistics-'+game.seed+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+ $('#rv-stat-scope').onchange=stats;$('#rv-stat-rates').onchange=stats;
+ $('#rv-restart').onclick=()=>{if(!game)return;if(confirm('Restart this match with the same seed and teams? Saved match history is kept.'))window.RIVALRY_STUDIO.restart()};
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)pause();});
  $('#rv-play').onclick=()=>{if(auto)pause();else play();paint()};
- $('#rv-step').onclick=()=>{pause();advance(cmd);picker()};
- $('#rv-nextfight').onclick=()=>{pause();advance(cmd,7);picker()};
+ $('#rv-step').onclick=()=>{pause();advance(null);picker()};
+ $('#rv-nextfight').onclick=()=>{pause();advance(null,150);picker()};
  $('#rv-full').onclick=()=>{fullSim();picker()};
  $('#rv-nextmap').onclick=()=>{if(game?.status==='between'){ENGINE.nextMap(game);persist();paint();picker()}};
- $('#rv-speed').onclick=e=>{const b=e.target.closest('[data-speed]');if(!b)return;speed=Number(b.dataset.speed);$('#rv-speed').querySelectorAll('[data-speed]').forEach(x=>x.classList.toggle('selected',x===b));if(auto){pause();play()}};
+ $('#rv-speed').onclick=e=>{const b=e.target.closest('[data-speed]');if(!b)return;speed=Number(b.dataset.speed);getDriver().setSpeed(speed);$('#rv-speed').querySelectorAll('[data-speed]').forEach(x=>x.classList.toggle('selected',x===b));if(auto){paint()}};
  $('#rv-teamsearch').oninput=renderProfiles;$('#rv-regionfilter').onchange=renderProfiles;
  $('#rv-tcreate').onclick=()=>{const teams=[...$('#rv-tteamselects').querySelectorAll('select')].map(x=>x.value);if(new Set(teams).size!==8){alert('Select eight distinct teams.');return}
   tournament={teams,best:Number($('#rv-tformat').value),results:Array(7).fill(null),seed:Date.now()>>>0,champion:null};save(TOURNAMENT,tournament);renderTournament()};
@@ -426,7 +417,7 @@ function hook(){
  });
 }
 hook();renderCommands();renderTournament();
-if(game&&game.v===2){
+if(false&&game&&game.v===2){
   // Previous builds stored the correct team name but often resolved every roster as 2026.
   // Start a clean replayable session with properly dated players, not stale OPEN slots.
   const old=game;game=ENGINE.create({
@@ -438,5 +429,5 @@ if(game&&game.v===2){
   persist();
 }
 if(game&&game.v>=3){openStudio('match');picker();loadPortraits()}
-window.RIVALRY_STUDIO=Object.freeze({launch,open:openStudio,close:closeStudio,state:()=>game});
+window.RIVALRY_STUDIO=Object.freeze({launch,open:openStudio,close:closeStudio,state:()=>game,refresh:paint,transport:getDriver,portraitUrl:hero=>heroImages[hero]||heroImages[heroSlug(hero)]||null,abilityIcon:(hero,name)=>{ensureAbilityIcons(hero);return abilityIcons[hero]?.[name]||null;},restart:()=>{if(game)launch(game.teams[0].name,game.teams[1].name,{...game.options,seasonA:game.teams[0].season,seasonB:game.teams[1].season,best:game.best,rules:game.rules,seed:game.seed})}});
 })();
