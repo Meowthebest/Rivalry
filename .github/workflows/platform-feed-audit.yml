@@ -1,0 +1,37 @@
+name: Inspect permitted platform feeds
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.github/workflows/platform-feed-audit.yml']
+permissions:
+  contents: read
+jobs:
+  sources:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect public download and MediaWiki API
+        run: |
+          mkdir -p feed-audit
+          python - <<'PY'
+          import urllib.request,urllib.parse,json,pathlib,hashlib,datetime,time
+          p=pathlib.Path('feed-audit'); report=[]
+          sources=[('liquipedia.json','https://liquipedia.net/overwatch/api.php?'+urllib.parse.urlencode({'action':'parse','page':'Liquipedia:Upcoming_and_ongoing_matches','prop':'text','format':'json','formatversion':'2'})),('owdb.sqlite3.gz','https://owdb.io/faceit.sqlite3.gz')]
+          for file,url in sources:
+            row={'source':url,'retrievedAt':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+            try:
+              req=urllib.request.Request(url,headers={'User-Agent':'RivalryFanPlatform/1.0 (https://github.com/Meowthebest/Rivalry; public esports data research)','Accept-Encoding':'gzip'})
+              with urllib.request.urlopen(req,timeout=45) as r:
+                data=r.read(30000000);row.update(status=r.status,contentType=r.headers.get('Content-Type'),encoding=r.headers.get('Content-Encoding'),etag=r.headers.get('ETag'),lastModified=r.headers.get('Last-Modified'),bytes=len(data),sha256=hashlib.sha256(data).hexdigest())
+              (p/file).write_bytes(data)
+            except Exception as e: row.update(status='unavailable',error=str(e))
+            report.append(row)
+            time.sleep(3)
+          (p/'sources.json').write_text(json.dumps(report,indent=2))
+          print(json.dumps(report,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: permitted-platform-feeds
+          path: feed-audit
+          retention-days: 7
