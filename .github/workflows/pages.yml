@@ -3,6 +3,8 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    - cron: '17,47 * * * *'
 permissions:
   contents: read
   pages: write
@@ -16,15 +18,53 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
-      - name: Checkout source
+      - name: Checkout existing project
         uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Restore permitted-source and published-data cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            .platform-cache
+            platform/data
+          key: rivalry-platform-feeds-v1-${{ github.run_id }}
+          restore-keys: rivalry-platform-feeds-v1-
+      - name: Install ingestion dependency
+        run: pip install beautifulsoup4==4.14.3
+      - name: Refresh permitted providers with timestamps and safe fallback
+        env:
+          FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
+          FACEIT_CHAMPIONSHIP_IDS: ${{ vars.FACEIT_CHAMPIONSHIP_IDS }}
+        run: python platform/sync.py
+      - name: Rebuild fixed-parameter ratings and time-safe validation
+        run: node platform/fit.cjs
+      - name: Test source integrity and prediction accounting
+        run: |
+          python tests/platform-sources.py
+          node tests/platform-model.cjs
+          for file in platform/*.js; do node --check "$file"; done
+      - name: Persist last-known source records and generated statistics
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            .platform-cache
+            platform/data
+          key: rivalry-platform-feeds-v1-${{ github.run_id }}
+      - name: Stage public website only
+        run: python platform/stage.py
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
-      - name: Upload static website
+      - name: Upload website
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4

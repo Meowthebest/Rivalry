@@ -1,0 +1,31 @@
+name: Platform data and prediction regression tests
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  platform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: pip install beautifulsoup4==4.14.3
+      - name: Source schema, status and exact-lineup tests
+        run: python tests/platform-sources.py
+      - name: No-leakage model and reproducible batch tests
+        run: node tests/platform-model.cjs
+      - name: Preserve existing lineup and world engine invariants
+        run: |
+          node tests/lineup-engine.cjs
+          node tests/world-invariants.cjs
+      - name: Syntax-check connected hub
+        run: |
+          for f in platform/*.js; do node --check "$f"; done
+          python -m py_compile platform/sync.py platform/stage.py

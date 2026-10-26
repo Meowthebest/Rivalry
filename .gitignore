@@ -1,0 +1,7 @@
+.platform-cache/
+platform/data/
+_site/
+node_modules/
+__pycache__/
+*.pyc
+validation/platform/*.png
