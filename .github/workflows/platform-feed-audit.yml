@@ -10,13 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Inspect documented MediaWiki API tournament pages
+      - name: Read prior stage via MediaWiki API at permitted rate
         run: |
           mkdir -p feed-audit
           python - <<'PY'
           import urllib.request,urllib.parse,json,pathlib,hashlib,datetime,time,gzip
           p=pathlib.Path('feed-audit'); report=[]
-          pages=['Overwatch_Champions_Series/2026/EMEA/Stage_3','Overwatch_Champions_Series/2026/NA/Stage_3','Overwatch_Champions_Series/2026/Asia/Stage_3/Korea','Overwatch_Champions_Series/2026/Asia/Stage_3/Japan','Overwatch_Champions_Series/2026/China/Stage_3','Overwatch_Champions_Series/2026/Asia/Stage_3/Pacific']
+          pages=['Overwatch_Champions_Series/2026/EMEA/Stage_2','Overwatch_Champions_Series/2026/NA/Stage_2','Overwatch_Champions_Series/2026/Asia/Stage_2/Korea','Overwatch_Champions_Series/2026/Asia/Stage_2/Japan','Overwatch_Champions_Series/2026/China/Stage_2','Overwatch_Champions_Series/2026/Asia/Stage_2/Pacific']
           for i,page in enumerate(pages):
             if i: time.sleep(31)
             url='https://liquipedia.net/overwatch/api.php?'+urllib.parse.urlencode({'action':'parse','page':page,'prop':'text','format':'json','formatversion':'2'})
@@ -26,7 +26,7 @@ jobs:
               with urllib.request.urlopen(req,timeout=45) as r:
                 data=r.read(10000000);row.update(status=r.status,encoding=r.headers.get('Content-Encoding'),bytes=len(data),sha256=hashlib.sha256(data).hexdigest())
                 if r.headers.get('Content-Encoding')=='gzip': data=gzip.decompress(data)
-              (p/(str(i)+'.json')).write_bytes(data)
+              (p/(str(i+6)+'.json')).write_bytes(data)
             except Exception as e: row.update(status='unavailable',error=str(e))
             report.append(row)
           (p/'sources.json').write_text(json.dumps(report,indent=2))
