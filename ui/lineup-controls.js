@@ -85,7 +85,9 @@
   s.teams.forEach((team,side)=>{
    const b=el('button',side===activeSide?'selected':'',`TEAM ${side+1} · ${team.name}`);b.type='button';b.setAttribute('role','tab');b.setAttribute('aria-selected',String(side===activeSide));b.onclick=()=>{activeSide=side;renderPanel(true)};tabs.append(b);
   });box.append(tabs);
-  const team=s.teams[activeSide],coverage=L.coverage(team.name,team.season,s.rules);
+  const team=s.teams[activeSide];
+  const observed=team.rosterSnapshot;
+  const coverage=observed?(()=>{const need={Tank:s.rules==='classic'?2:1,Damage:2,Support:2},found={Tank:0,Damage:0,Support:0};for(const p of observed.players||[])if(Object.hasOwn(found,p.role))found[p.role]++;const missing=Object.entries(need).filter(([r,n])=>found[r]<n).map(([role,n])=>({role,count:n-found[role]}));return {roster:observed,found,missing,complete:missing.length===0};})():L.coverage(team.name,team.season,s.rules);
   const heading=el('div','rvl-selected-team');
   const icon=el('div','rvl-team-emblem');window.RIVALRY_LOGOS?.paint(icon,team.name,team.season);
   const h=el('div');h.append(el('strong','',team.name),el('span','',`${team.season} · ${s.rules==='classic'?'6v6':'5v5'} · ${coverage.complete?'sourced lineup':'incomplete roster'}`));heading.append(icon,h);box.append(heading);

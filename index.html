@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
 <meta name="theme-color" content="#0a101a" />
 <meta name="description" content="Rivalry Overwatch Broadcast Studio — stateful spectator simulation, 2018–2026 team archive, interactive kill feed, player stats, and historical tournaments." />
-<title>Rivalry — Esports Match Simulator | OWCS 2026</title>
+<title>Rivalry — Overwatch Match Intelligence & Live Simulation</title>
 <meta property="og:title" content="Rivalry — Esports Match Simulator" />
 <meta property="og:description" content="Your teams. Your match. Your calls." />
 <meta property="og:type" content="website" />
@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="./style.css">
 <link rel="stylesheet" href="./archive.css">
 <link rel="stylesheet" href="./studio.css">
+<link rel="stylesheet" href="./platform/styles.css?v=hub1">
 <link rel="stylesheet" href="./data/season-selector.css">
 <link rel="stylesheet" href="./data/hero-gallery.css">
 <link rel="stylesheet" href="./ui/lineup-upgrade.css?v=lineups4">
@@ -87,10 +88,14 @@
 <script src="./engine/world-sim.js?v=observer5"></script>
 <script src="./engine/playback-clock.js?v=observer5"></script>
 <script src="./ui/team-logos.js?v=lineups4"></script>
-<script src="./ui/lineup-controls.js?v=observer5"></script>
+<script src="./ui/lineup-controls.js?v=hub1"></script>
+<script src="./platform/sim-bridge.js?v=hub1"></script>
 <script src="./studio.js?v=observer5"></script>
 <script src="./ui/tactical-observer.js?v=observer5"></script>
 <script src="./data/season-selector.js"></script>
 <script src="./data/hero-gallery.js"></script>
+<script src="./platform/model.js?v=hub1"></script>
+<script src="./platform/store.js?v=hub1"></script>
+<script src="./platform/app.js?v=hub1"></script>
 </body>
 </html>

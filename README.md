@@ -105,3 +105,10 @@ source attribution is not a claim of a redistribution license.
 Not affiliated with Blizzard, FACEIT, OWDB, Liquipedia, teams or tournament organizers.
 All simulated matches, coordinates and results are fictional. Browser-local saves
 remain on the user's device. No private match credentials or hidden telemetry are used.
+
+
+## Connected platform upgrade — 26 October 2026
+
+The default homepage now provides sourced OWCS fixtures, FACEIT recorded results, team/player/event profiles, result-based model explanations, reproducible 100/1,000/10,000 statistical series draws, and a real-fixture handoff into the existing Watch Live observer. Match simulator retains the prior archives, other esports and custom tournament modes.
+
+See [PLATFORM.md](PLATFORM.md) for source permissions, 30-minute scheduled publication, optional server-side FACEIT configuration, metric definitions, held-out validation, data limits and tests. Generated source data is built by the Pages workflow, not checked into Git; raw source caches are excluded from deployment.

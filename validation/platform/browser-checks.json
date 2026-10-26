@@ -1,0 +1,37 @@
+{
+  "browser": "144.0.7559.96",
+  "transport": "Exact repository scripts; actual published JSON read in memory; external asset failures expected. Worker uses exact repository source via Blob.",
+  "checks": [
+    "Homepage derives future fixtures and recorded results from the published source JSON; no hardcoded demo fixture.",
+    "Actual fixture opens a match center with both event-specific role-complete source squads.",
+    {
+      "fixtureToObserver": {
+        "names": [
+          [
+            "Mealgaru",
+            "Proper",
+            "KNIFE",
+            "Shu",
+            "Viol2t"
+          ],
+          [
+            "Belosrea",
+            "K4NE",
+            "Profit",
+            "TENTEN",
+            "Trest"
+          ]
+        ],
+        "worldVersion": 5,
+        "autoplay": true
+      }
+    },
+    "Results tab, search and missing-result empty state work against real records.",
+    "10,000 independent outcome simulations executed in a real Web Worker and rendered a computed distribution.",
+    "Team profile supports source-dated roster selection and real match history.",
+    "Mobile Menu opens accessible navigation and closes without disturbing the page.",
+    "390px mobile home and match center remain within viewport width.",
+    "Existing match creator and other esports remain accessible."
+  ],
+  "errors": []
+}
